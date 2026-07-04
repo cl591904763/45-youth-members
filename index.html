@@ -843,6 +843,7 @@ async function handleLogin(e) {
         if (res.success) {
             toast('登录成功！🎉');
             closeModal('login-modal');
+            _sessionLoggedOut = false;
             loadUserState();
         } else {
             toast(res.message || '登录失败', 'error');
@@ -872,6 +873,7 @@ async function handleRegister(e) {
         if (res.success) {
             toast('注册成功！欢迎加入45°青年 🎉');
             closeModal('register-modal');
+            _sessionLoggedOut = false;
             loadUserState();
         } else {
             toast(res.message || '注册失败', 'error');
@@ -883,31 +885,52 @@ async function handleRegister(e) {
 }
 
 async function doLogout() {
+    // 1. Clear SDK auth session
     try { await client.auth.signOut(); } catch(_) {}
-    try { localStorage.removeItem('aipexbase-auth'); } catch(_) {}
+    // 2. Nuke everything in browser storage (token/cache/session entirely)
+    try { localStorage.clear(); } catch(_) {}
     try { sessionStorage.clear(); } catch(_) {}
-    toast('已退出登录');
+    // 3. Set logged-out flag so getCurrentUser() NEVER hits the API again
+    _sessionLoggedOut = true;
     currentUser = null;
+    // 4. Force-update all UI immediately
     document.getElementById('nav-user-text').textContent = '用户';
-    document.getElementById('join-guest').classList.remove('hidden');
-    document.getElementById('join-member').classList.add('hidden');
-    document.getElementById('user-guest').classList.remove('hidden');
-    document.getElementById('user-member').classList.add('hidden');
+    const jg = document.getElementById('join-guest');
+    const jm = document.getElementById('join-member');
+    if (jg) jg.classList.remove('hidden');
+    if (jm) jm.classList.add('hidden');
+    const ug = document.getElementById('user-guest');
+    const um = document.getElementById('user-member');
+    if (ug) ug.classList.remove('hidden');
+    if (um) um.classList.add('hidden');
+    // 5. Navigate home, then force refresh user page state on next visit
     navigate('home');
+    toast('已退出登录');
 }
 
 let currentUser = null;
+let _sessionLoggedOut = false;
 
+/** Get current user: returns local user if set.
+ *  If logged out, NEVER calls the API again (SDK in-memory cache can lie). */
 async function getCurrentUser() {
+    if (currentUser) return currentUser;
+    if (_sessionLoggedOut) return null;
+    // First-ever page load: try API once to restore session
     try {
         const res = await client.auth.getUser();
-        if (res.success) { currentUser = res.data; return res.data; }
-        currentUser = null;
-        return null;
-    } catch(_) { currentUser = null; return null; }
+        if (res && res.success && res.data) {
+            currentUser = res.data;
+            return res.data;
+        }
+    } catch(_) {}
+    return null;
 }
 
+/** Load user state: use local currentUser variable as source of truth.
+ *  Only calls API on first-ever load (when currentUser is undefined/null and no login has happened yet in this session). */
 async function loadUserState() {
+    // First time in this page session? Try API to see if there's a logged-in user
     const user = await getCurrentUser();
     const guest = document.getElementById('join-guest');
     const member = document.getElementById('join-member');
