@@ -1,0 +1,45 @@
+{
+  "name": "45°青年会员系统",
+  "needAuth": true,
+  "authTable": "members",
+  "rlsPolicies": [],
+  "tables": [
+    {
+      "tableName": "members",
+      "description": "会员信息表",
+      "columns": [
+        {"columnName": "id", "columnType": "INT", "columnComment": "主键ID", "isRequired": true, "isPrimary": true, "isShow": true},
+        {"columnName": "name", "columnType": "VARCHAR(255)", "columnComment": "姓名", "isRequired": true, "isPrimary": false, "isShow": true},
+        {"columnName": "phone", "columnType": "phone", "columnComment": "手机号（登录账号）", "isRequired": true, "isPrimary": false, "isShow": true},
+        {"columnName": "password", "columnType": "password", "columnComment": "密码", "isRequired": true, "isPrimary": false, "isShow": false},
+        {"columnName": "email", "columnType": "email", "columnComment": "邮箱", "isRequired": false, "isPrimary": false, "isShow": true},
+        {"columnName": "wechat_id", "columnType": "VARCHAR(255)", "columnComment": "微信号", "isRequired": false, "isPrimary": false, "isShow": true},
+        {"columnName": "age", "columnType": "number", "columnComment": "年龄", "isRequired": false, "isPrimary": false, "isShow": true},
+        {"columnName": "occupation", "columnType": "VARCHAR(255)", "columnComment": "职业/身份", "isRequired": false, "isPrimary": false, "isShow": true},
+        {"columnName": "interests", "columnType": "fullText", "columnComment": "关注领域", "isRequired": false, "isPrimary": false, "isShow": true},
+        {"columnName": "join_date", "columnType": "datetime", "columnComment": "加入时间", "isRequired": false, "isPrimary": false, "isShow": true},
+        {"columnName": "status", "columnType": "VARCHAR(50)", "columnComment": "状态(active/inactive)", "isRequired": false, "isPrimary": false, "isShow": true},
+        {"columnName": "is_admin", "columnType": "boolean", "columnComment": "是否管理员", "isRequired": false, "isPrimary": false, "isShow": true},
+        {"columnName": "created_at", "columnType": "datetime", "columnComment": "创建时间", "isRequired": false, "isPrimary": false, "isShow": true},
+        {"columnName": "updated_at", "columnType": "datetime", "columnComment": "更新时间", "isRequired": false, "isPrimary": false, "isShow": true}
+      ]
+    },
+    {
+      "tableName": "activities",
+      "description": "活动信息表",
+      "columns": [
+        {"columnName": "id", "columnType": "INT", "columnComment": "主键ID", "isRequired": true, "isPrimary": true, "isShow": true},
+        {"columnName": "title", "columnType": "VARCHAR(255)", "columnComment": "活动标题", "isRequired": true, "isPrimary": false, "isShow": true},
+        {"columnName": "summary", "columnType": "fullText", "columnComment": "活动简介", "isRequired": true, "isPrimary": false, "isShow": true},
+        {"columnName": "content", "columnType": "fullText", "columnComment": "活动详情", "isRequired": false, "isPrimary": false, "isShow": false},
+        {"columnName": "date", "columnType": "date", "columnComment": "活动日期", "isRequired": true, "isPrimary": false, "isShow": true},
+        {"columnName": "location", "columnType": "VARCHAR(500)", "columnComment": "活动地点", "isRequired": true, "isPrimary": false, "isShow": true},
+        {"columnName": "cover_image", "columnType": "images", "columnComment": "封面图片", "isRequired": false, "isPrimary": false, "isShow": true},
+        {"columnName": "category", "columnType": "VARCHAR(50)", "columnComment": "分类(培训/实践/活动)", "isRequired": false, "isPrimary": false, "isShow": true},
+        {"columnName": "type", "columnType": "VARCHAR(50)", "columnComment": "类型(upcoming/past)", "isRequired": true, "isPrimary": false, "isShow": true},
+        {"columnName": "status", "columnType": "VARCHAR(50)", "columnComment": "状态(draft/published)", "isRequired": false, "isPrimary": false, "isShow": true},
+        {"columnName": "created_at", "columnType": "datetime", "columnComment": "创建时间", "isRequired": false, "isPrimary": false, "isShow": true}
+      ]
+    }
+  ]
+}
