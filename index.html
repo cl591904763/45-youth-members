@@ -192,7 +192,7 @@
 <nav class="fixed top-0 left-0 right-0 z-40" style="background:rgba(255,255,255,0.92);backdrop-filter:blur(16px);border-bottom:1px solid rgba(0,0,0,0.04);">
     <div class="max-w-6xl mx-auto px-4 sm:px-8 h-16 flex items-center justify-between">
         <!-- Logo -->
-        <a href="#/" onclick="navigate('home');return false;" class="flex items-center gap-2 no-underline">
+        <a href="#/" onclick="navigate('home');return false;" class="flex items-center gap-2 no-underline" id="admin-easter-egg">
             <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#2d8a2d,#6fc46f);display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;font-weight:900;font-family:'Noto Serif SC',serif;letter-spacing:1px;">45°</div>
             <span class="font-bold text-lg hidden sm:block" style="font-family:'Noto Serif SC',serif;color:#2d2818;">45°青年</span>
         </a>
@@ -767,6 +767,19 @@ const GALLERY_IMAGES = [
 // ===== LOCAL REGISTRATIONS (in-memory for demo) =====
 let userRegistrations = [];
 
+// Admin easter egg: click logo 5x to unlock admin
+let adminClickCount = 0;
+if (document.getElementById('admin-easter-egg')) {
+    document.getElementById('admin-easter-egg').addEventListener('click', function(e) {
+        adminClickCount++;
+        if (adminClickCount >= 5) {
+            adminClickCount = 0;
+            navigate('admin');
+            toast('✦ 管理后台已解锁 ✦');
+        }
+    });
+}
+
 // ===== UTILITY =====
 function toast(msg, type='success') {
     const c = document.getElementById('toast-c');
@@ -871,7 +884,10 @@ async function handleRegister(e) {
 
 async function doLogout() {
     try { await client.auth.signOut(); } catch(_) {}
+    try { localStorage.removeItem('aipexbase-auth'); } catch(_) {}
+    try { sessionStorage.clear(); } catch(_) {}
     toast('已退出登录');
+    currentUser = null;
     document.getElementById('nav-user-text').textContent = '用户';
     document.getElementById('join-guest').classList.remove('hidden');
     document.getElementById('join-member').classList.add('hidden');
@@ -880,11 +896,15 @@ async function doLogout() {
     navigate('home');
 }
 
+let currentUser = null;
+
 async function getCurrentUser() {
     try {
         const res = await client.auth.getUser();
-        return res.success ? res.data : null;
-    } catch(_) { return null; }
+        if (res.success) { currentUser = res.data; return res.data; }
+        currentUser = null;
+        return null;
+    } catch(_) { currentUser = null; return null; }
 }
 
 async function loadUserState() {
