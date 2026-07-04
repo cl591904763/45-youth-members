@@ -721,7 +721,7 @@ const client = aipexbase.createClient({ baseUrl: BASE_URL, apiKey: API_KEY });
 
 // ===== ACTIVITY DATA =====
 const ACTIVITIES = [
-    { id:'act1', title:'0元60天·公益融合艺术节', summary:'废弃地下家具城改造为艺术空间，招募策展人/艺术家/志愿者，共同打造一场前所未有的公益融合艺术节。', date:'2026-08-01', location:'上海·康健商务广场·1号楼地下一层', category:'活动', type:'upcoming', images:['pdf_p12_3.jpeg','pdf_p12_4.jpeg','pdf_p12_5.jpeg'], detail:'这是一个为期60天的公益艺术实验。我们将废弃的地下家具城改造为全新的艺术空间，邀请策展人、艺术家、设计师和志愿者共同参与。从空间改造到展览策划，从工作坊到开幕活动——全程共创，打造属于青年群体的融合艺术IP。\n\n招募对象：\n- 策展人/助理策展人\n- 视觉/空间艺术家\n- 志愿者（布展、导览、摄影）\n- 活动策划执行' },
+    { id:'act1', title:'0元60天·公益融合艺术节', summary:'废弃地下家具城改造为艺术空间，招募策展人/艺术家/志愿者，共同打造一场前所未有的公益融合艺术节。', date:'2026-08-01', location:'上海·康健商务广场·1号楼地一层', category:'活动', type:'upcoming', images:['pdf_p12_3.jpeg','pdf_p12_4.jpeg','pdf_p12_5.jpeg'], externalUrl:'https://cl591904763.github.io/zero-art-festival/', detail:'这是一个为期60天的公益艺术实验。我们将废弃的地下家具城改造为全新的艺术空间，邀请策展人、艺术家、设计师和志愿者共同参与。从空间改造到展览策划，从工作坊到开幕活动——全程共创，打造属于青年群体的融合艺术IP。\n\n招募对象：\n- 策展人/助理策展人\n- 视觉/空间艺术家\n- 志愿者（布展、导览、摄影）\n- 活动策划执行' },
     { id:'act2', title:'青年夜校：无障碍设计入门', summary:'四期课程，从意识唤醒到实操设计思维，了解无障碍设计的核心理念', date:'2026-07-20', location:'上海·静安区', category:'培训', type:'upcoming', images:['pdf_p15_3.jpeg','pdf_p15_5.jpeg'], detail:'青年夜校系列课程——无障碍设计入门。\n\n课程安排：\n第1讲：无障碍设计概论（意识唤醒）\n第2讲：包容性设计思维\n第3讲：物理空间无障碍改造\n第4讲：数字产品无障碍实践\n\n每期课程约2小时，含互动工作坊环节。' },
     { id:'act3', title:'志愿者赋能工作坊', summary:'融合活动中的沟通技巧与无障碍服务实践', date:'2026-07-28', location:'上海·徐汇区', category:'培训', type:'upcoming', images:['pdf_p08_5.jpeg','pdf_p08_7.jpeg'], detail:'面向志愿者的赋能工作坊，内容涵盖：\n- 与视障/听障人士的沟通技巧\n- 轮椅助行与导盲随行\n- 融合活动中的角色分工\n- 真实案例分享与模拟演练\n\n完成工作坊可获得志愿者赋能证书。' },
     { id:'act4', title:'2026全国助残日主题快闪', summary:'"保障平等权益，促进融合发展"街头公益行动', date:'2026-05-17', location:'上海·外滩', category:'活动', type:'past', images:['pdf_p09_3.jpeg','pdf_p09_4.jpeg','pdf_p09_5.jpeg','pdf_p09_6.jpeg','pdf_p09_7.jpeg'], detail:'2026年全国助残日，我们在外滩发起街头公益快闪行动。通过互动体验装置、融合表演和公益市集，让更多人了解无障碍的重要性和包容性社会的价值。' },
@@ -1010,6 +1010,7 @@ function loadActivityDetail(id) {
     const a = ACTIVITIES.find(x => x.id === id);
     if (!a) { el.innerHTML = '<div class="text-center py-20" style="color:#a09070;">活动未找到</div>'; return; }
     const images = a.images || [];
+    const isExternal = !!a.externalUrl;
     el.innerHTML = `
         <div class="card-u overflow-hidden mb-8">
             ${images.length > 0 ? `<div style="overflow:hidden;"><img src="${IMG_PATH+images[0]}" alt="${a.title}" style="width:100%;aspect-ratio:16/9;object-fit:cover;"></div>` : ''}
@@ -1033,7 +1034,10 @@ function loadActivityDetail(id) {
             </div>
         </div>` : ''}
         <div class="flex gap-4">
-            <button onclick="registerForActivity('${a.id}')" class="btn-u btn-primary text-base px-8 py-3">📝 报名参加</button>
+            ${isExternal 
+              ? `<a href="${a.externalUrl}" target="_blank" class="btn-u btn-primary text-base px-8 py-3">🌐 前往艺术节官网报名 →</a>`
+              : `<button onclick="registerForActivity('${a.id}')" class="btn-u btn-primary text-base px-8 py-3">📝 报名参加</button>`
+            }
             <button onclick="navigate('activities')" class="btn-u btn-ghost text-base px-6 py-3">返回</button>
         </div>
     `;
