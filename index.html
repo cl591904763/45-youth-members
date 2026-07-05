@@ -1568,13 +1568,10 @@ async function sendAI() {
   } catch (err) {
     hideTyping();
     console.error('AI error:', err);
-    // Fallback responses if API fails
-    const fallbacks = [
-      '🤖 我刚走神了一下…你说了啥？要不重来一遍？',
-      '信号有点飘啊…不过你说的话我记着呢，再试一次？',
-      '🌱 斜杠君宕机0.1秒已恢复。你要聊什么来着？',
-    ];
-    addBotMsg(fallbacks[Math.floor(Math.random() * fallbacks.length)]);
+    const errMsg = err.message || String(err);
+    // Show the actual error so user can debug
+    const shortErr = errMsg.length > 120 ? errMsg.slice(0,120)+'…' : errMsg;
+    addBotMsg('⚠️ 斜杠君遇到了一个问题：\n' + shortErr + '\n\n(按F12看控制台有完整错误)');
   }
   
   sendBtn.disabled = false;
@@ -1584,7 +1581,11 @@ async function sendAI() {
 // Helper to get user info from the main app context
 async function getUserInfo() {
   if (typeof getCurrentUser === 'function') {
-    try { return await getCurrentUser(); } catch(e) { return null; }
+    // Timeout after 3s so BAAS slowness doesn't block the AI
+    const timeout = new Promise(r => setTimeout(() => r(null), 3000));
+    try {
+      return await Promise.race([getCurrentUser(), timeout]);
+    } catch(e) { return null; }
   }
   return null;
 }
