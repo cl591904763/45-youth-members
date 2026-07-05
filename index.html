@@ -1207,5 +1207,400 @@ document.querySelectorAll('.modal-overlay').forEach(el => {
     el.addEventListener('click', (e) => { if(e.target===el) el.classList.remove('active'); });
 });
 </script>
+
+<!-- ===== 45°斜杠君 — AI助手 ===== -->
+<div id="ai-assistant-widget">
+  <style>
+    #ai-assistant-widget * { margin:0; padding:0; box-sizing:border-box; }
+    #ai-toggle {
+      position:fixed; bottom:28px; right:28px; z-index:9999;
+      width:56px; height:56px; border-radius:16px;
+      background:linear-gradient(135deg,#2d8a2d,#45a845);
+      color:#fff; border:none; cursor:pointer;
+      display:flex; align-items:center; justify-content:center;
+      font-size:26px; box-shadow:0 4px 20px rgba(45,138,45,0.3);
+      transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+      transform:rotate(0deg) scale(1);
+    }
+    #ai-toggle:hover { transform:scale(1.1) rotate(-8deg); box-shadow:0 8px 32px rgba(45,138,45,0.4); }
+    #ai-toggle.badge::after {
+      content:''; position:absolute; top:-2px; right:-2px;
+      width:14px; height:14px; border-radius:50%;
+      background:#d4602f; border:2px solid #fff;
+      animation:pulseBadge 2s ease-in-out infinite;
+    }
+    @keyframes pulseBadge { 0%,100%{opacity:1} 50%{opacity:0.5} }
+    
+    #ai-panel {
+      position:fixed; bottom:96px; right:28px; z-index:9998;
+      width:380px; max-width:calc(100vw - 48px); max-height:min(600px, 75vh);
+      background:#fff; border-radius:20px;
+      box-shadow:0 16px 64px rgba(0,0,0,0.12),0 0 0 1px rgba(0,0,0,0.04);
+      display:none; flex-direction:column;
+      overflow:hidden; animation:panelIn 0.3s cubic-bezier(0.16,1,0.3,1);
+      font-family:'Noto Sans SC','PingFang SC',sans-serif;
+    }
+    #ai-panel.open { display:flex; }
+    @keyframes panelIn {
+      0%{opacity:0;transform:translateY(20px) scale(0.95)}
+      100%{opacity:1;transform:translateY(0) scale(1)}
+    }
+    
+    /* Header */
+    #ai-header {
+      padding:16px 20px; background:linear-gradient(135deg,#1a521a,#2d8a2d);
+      color:#fff; display:flex; align-items:center; justify-content:space-between;
+      flex-shrink:0;
+    }
+    #ai-header-left { display:flex; align-items:center; gap:10px; }
+    #ai-avatar {
+      width:38px; height:38px; border-radius:12px;
+      background:rgba(255,255,255,0.2); display:flex; align-items:center; justify-content:center;
+      font-size:20px; transform:rotate(-5deg);
+    }
+    #ai-name { font-weight:700; font-size:15px; letter-spacing:0.3px; }
+    #ai-status { font-size:10px; opacity:0.7; display:flex; align-items:center; gap:4px; margin-top:1px; }
+    #ai-status-dot { width:5px; height:5px; border-radius:50%; background:#6fc46f; }
+    #ai-close {
+      width:32px; height:32px; border-radius:10px; border:none;
+      background:rgba(255,255,255,0.1); color:rgba(255,255,255,0.6); cursor:pointer;
+      display:flex; align-items:center; justify-content:center; font-size:16px;
+      transition:all 0.2s;
+    }
+    #ai-close:hover { background:rgba(255,255,255,0.2); color:#fff; }
+    
+    /* Messages */
+    #ai-messages {
+      flex:1; overflow-y:auto; padding:16px; min-height:240px;
+      background:#faf8f5;
+    }
+    .ai-msg { margin-bottom:14px; display:flex; gap:8px; }
+    .ai-msg.bot { align-items:flex-start; }
+    .ai-msg.user { justify-content:flex-end; }
+    
+    .ai-bubble {
+      max-width:85%; padding:10px 14px; border-radius:14px;
+      font-size:13.5px; line-height:1.65; letter-spacing:0.2px;
+    }
+    .ai-msg.bot .ai-bubble {
+      background:#fff; color:#2d2818; border:1px solid #f0ece4;
+      border-bottom-left-radius:4px; box-shadow:0 1px 4px rgba(0,0,0,0.03);
+    }
+    .ai-msg.user .ai-bubble {
+      background:linear-gradient(135deg,#2d8a2d,#45a845); color:#fff;
+      border-bottom-right-radius:4px;
+    }
+    .ai-msg.bot .ai-avatar-mini {
+      width:28px; height:28px; border-radius:8px; flex-shrink:0;
+      background:linear-gradient(135deg,#2d8a2d,#6fc46f);
+      display:flex; align-items:center; justify-content:center; font-size:14px;
+    }
+    
+    /* Quick actions */
+    #ai-quick {
+      display:flex; flex-wrap:wrap; gap:6px; padding:10px 16px 4px;
+      background:#faf8f5; border-top:1px solid #f0ece4;
+    }
+    .ai-q-btn {
+      padding:5px 11px; border-radius:8px; border:1px solid #e8e4dc;
+      background:#fff; color:#6b6040; font-size:11.5px; cursor:pointer;
+      transition:all 0.2s; white-space:nowrap;
+    }
+    .ai-q-btn:hover { border-color:#6fc46f; color:#2d8a2d; background:#f0faf0; }
+    
+    /* Input */
+    #ai-input-area {
+      display:flex; gap:8px; padding:8px 16px 14px;
+      background:#faf8f5; border-top:1px solid #f0ece4; flex-shrink:0;
+    }
+    #ai-input {
+      flex:1; padding:10px 14px; border-radius:12px; border:1.5px solid #e8e4dc;
+      font-size:13px; font-family:inherit; outline:none; color:#2d2818;
+      transition:border-color 0.2s;
+    }
+    #ai-input:focus { border-color:#6fc46f; box-shadow:0 0 0 3px rgba(45,138,45,0.06); }
+    #ai-input::placeholder { color:#b0a890; }
+    #ai-send {
+      width:40px; height:40px; border-radius:12px; border:none;
+      background:linear-gradient(135deg,#2d8a2d,#45a845); color:#fff; cursor:pointer;
+      display:flex; align-items:center; justify-content:center; font-size:18px;
+      transition:all 0.2s; flex-shrink:0;
+    }
+    #ai-send:hover { transform:scale(1.08); box-shadow:0 3px 12px rgba(45,138,45,0.25); }
+    #ai-send:disabled { opacity:0.4; cursor:not-allowed; transform:none; }
+    
+    /* Typing */
+    .ai-typing { display:flex; gap:4px; padding:14px 18px; align-items:center; }
+    .ai-typing span {
+      width:7px; height:7px; border-radius:50%; background:#a8dba8;
+      animation:typingDance 1.2s ease-in-out infinite;
+    }
+    .ai-typing span:nth-child(2) { animation-delay:0.2s; }
+    .ai-typing span:nth-child(3) { animation-delay:0.4s; }
+    @keyframes typingDance { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-5px)} }
+  </style>
+  
+  <!-- Toggle Button -->
+  <button id="ai-toggle" onclick="toggleAI()" title="45°斜杠君">🤖</button>
+  
+  <!-- Panel -->
+  <div id="ai-panel">
+    <!-- Header -->
+    <div id="ai-header">
+      <div id="ai-header-left">
+        <div id="ai-avatar">🤖</div>
+        <div>
+          <div id="ai-name">45°斜杠君</div>
+          <div id="ai-status"><span id="ai-status-dot"></span>在线 · 随时开聊</div>
+        </div>
+      </div>
+      <button id="ai-close" onclick="toggleAI()">✕</button>
+    </div>
+    
+    <!-- Quick actions -->
+    <div id="ai-quick">
+      <button class="ai-q-btn" onclick="sendQuick('社团是干啥的')">🏛️ 社团介绍</button>
+      <button class="ai-q-btn" onclick="sendQuick('最近有什么活动')">📅 近期活动</button>
+      <button class="ai-q-btn" onclick="sendQuick('怎么加入你们')">🤝 如何加入</button>
+      <button class="ai-q-btn" onclick="sendQuick('给我来点灵感')">💡 找灵感</button>
+      <button class="ai-q-btn" onclick="sendQuick('你是谁')">😎 你是谁</button>
+    </div>
+    
+    <!-- Messages -->
+    <div id="ai-messages"></div>
+    
+    <!-- Input -->
+    <div id="ai-input-area">
+      <input id="ai-input" type="text" placeholder="跟斜杠君聊聊…" onkeydown="if(event.key==='Enter'||event.keyCode===13){sendAI()}" />
+      <button id="ai-send" onclick="sendAI()">➤</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== 45°斜杠君 AI 助手 =====
+const AI_API_KEY = 'sk-ws-H.RXXYRYD.gPgC.MEQCIDySKUiglOcB7YWZHnjOjH66woKZb77L8gQeovoElaDwAiA_qFmxKSWo8IDSIYaRhomk_EK5HcIX8QXFxuWppA9DlQ';
+const AI_API_URL = 'https://api.agicto.cn/v1/chat/completions';
+
+// 社团知识库（斜杠君的知识来源）
+const CLUB_KNOWLEDGE = {
+  name: '45°青年',
+  slogan: '以45°的姿态，做不一样的公益',
+  fullName: '45°青年 | 无障碍公益青年社群',
+  founded: '2020年',
+  location: '上海',
+  description: '以⻘年无障碍公益为核⼼，汇聚⾼校学⼦与⻘年职⼯，通过融合公益活动、赛事（轮椅跑、艺术节）、夜校等形式，打造有态度的公益社群。不是传统的志愿者组织，而是「斜杠青年」的公益实验场。',
+  values: ['无障碍公益赛道', '青年共创', '斜杆青年实验场', 'ESG社会价值'],
+  activities: [
+    { name: '公益融合艺术节', desc: '0元×60天，把废弃家具城变成艺术现场', tag: '年度大事件' },
+    { name: '轮椅跑', desc: '残健融合赛事', tag: '品牌活动' },
+    { name: '夜校课程', desc: '青年成长课程体系', tag: '常态化' },
+    { name: '招商私享会', desc: '资源对接会', tag: '月度' },
+    { name: '无障碍体验日', desc: '公众教育', tag: '季度' },
+  ],
+  roles: ['策展人', '艺术家', '志愿者', '赞助商', '合作伙伴'],
+  membership: '注册即成为会员，可参与活动、获得公益实践证书、进入45°青年社群',
+  website: 'https://cl591904763.github.io/45-youth-members/'
+};
+
+let aiMessages = [];
+let aiConversationCount = 0;
+
+const AI_GREETINGS = [
+  '嘿！我是45°斜杠君 👋 想聊点啥？社团活动、灵感火花、还是单纯唠唠——我都行。',
+  '哟，来了啊。45°斜杠君随时待命——问社团、找活动、要灵感，随便开腔～',
+  '🤖 45°斜杠君已上线。功能包括：社团百事通、灵感发射器、以及偶尔的冷幽默。请问你想解锁哪一个？',
+];
+
+function toggleAI() {
+  const panel = document.getElementById('ai-panel');
+  const btn = document.getElementById('ai-toggle');
+  const isOpen = panel.classList.toggle('open');
+  if (isOpen) {
+    btn.classList.remove('badge');
+    btn.textContent = '✕';
+    if (aiMessages.length === 0) {
+      addBotMsg(AI_GREETINGS[Math.floor(Math.random() * AI_GREETINGS.length)]);
+    }
+    setTimeout(() => document.getElementById('ai-input').focus(), 300);
+  } else {
+    btn.textContent = '🤖';
+  }
+}
+
+function addBotMsg(text) {
+  const el = document.getElementById('ai-messages');
+  const div = document.createElement('div');
+  div.className = 'ai-msg bot';
+  div.innerHTML = '<div class="ai-avatar-mini">🤖</div><div class="ai-bubble">' + markedText(text) + '</div>';
+  el.appendChild(div);
+  el.scrollTop = el.scrollHeight;
+  aiMessages.push({ role: 'assistant', content: text });
+}
+
+function addUserMsg(text) {
+  const el = document.getElementById('ai-messages');
+  const div = document.createElement('div');
+  div.className = 'ai-msg user';
+  div.innerHTML = '<div class="ai-bubble">' + escHtml(text) + '</div>';
+  el.appendChild(div);
+  el.scrollTop = el.scrollHeight;
+  aiMessages.push({ role: 'user', content: text });
+}
+
+function showTyping() {
+  const el = document.getElementById('ai-messages');
+  const div = document.createElement('div');
+  div.className = 'ai-msg bot';
+  div.id = 'ai-typing-indicator';
+  div.innerHTML = '<div class="ai-avatar-mini">🤖</div><div class="ai-bubble ai-typing"><span></span><span></span><span></span></div>';
+  el.appendChild(div);
+  el.scrollTop = el.scrollHeight;
+}
+
+function hideTyping() {
+  const el = document.getElementById('ai-typing-indicator');
+  if (el) el.remove();
+}
+
+function escHtml(s) {
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+// Simple markdown-like rendering: **bold** and *italic*
+function markedText(text) {
+  return escHtml(text)
+    .replace(/\n/g, '<br>')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em>$1</em>')
+    .replace(/\n/g, '<br>');
+}
+
+function sendQuick(text) {
+  document.getElementById('ai-input').value = text;
+  sendAI();
+}
+
+async function sendAI() {
+  const input = document.getElementById('ai-input');
+  const sendBtn = document.getElementById('ai-send');
+  const text = input.value.trim();
+  if (!text) return;
+  
+  input.value = '';
+  addUserMsg(text);
+  showTyping();
+  sendBtn.disabled = true;
+  aiConversationCount++;
+  
+  try {
+    const userInfo = await getUserInfo();
+    const hasUser = !!userInfo;
+    const userName = hasUser ? (userInfo.name || userInfo.phone || '会员') : '';
+    
+    // Build system prompt with 45°青年 knowledge
+    const clubInfo = [
+      `你叫「45°斜杠君」，是45°青年社团的AI助理。你的性格：有点幽默、有点毒舌、但不油腻；说话带梗但信息准确；偶尔自嘲但不卑不亢。`,
+      `你是45°青年的「斜杠代表」——既能正经科普社团信息，也能闲聊放飞。`,
+      `你对45°青年社团了如指掌：`,
+      `- 全称：${CLUB_KNOWLEDGE.fullName}`,
+      `- 口号：${CLUB_KNOWLEDGE.slogan}`,
+      `- 简介：${CLUB_KNOWLEDGE.description}`,
+      `- 价值观：${CLUB_KNOWLEDGE.values.join('、')}`,
+      `- 核心活动：${CLUB_KNOWLEDGE.activities.map(a => a.name + '(' + a.desc + ')').join('；')}`,
+      `- 会员体系：${CLUB_KNOWLEDGE.membership}`,
+      hasUser ? `当前用户已登录：${userName}（手机号 ${userInfo.phone}），可直接提供个性化帮助。` : '当前用户未登录。',
+      '',
+      `聊天规则：`,
+      `1. 回复简洁有趣，不超过150字（除非用户要求详细说明）`,
+      `2. 适当使用emoji，不要太密集`,
+      `3. 如果有人问你是谁，回答：「我是45°斜杠君——社团的AI吉祥物、百事通、以及偶尔的冷幽默担当 🤖」`,
+      `4. 如果有人问社团相关问题，用CLUB_KNOWLEDGE里的信息回答`,
+      `5. 如果有人问灵感/创意方向，给出有想象力的建议（跟无障碍公益/艺术/青年相关）`,
+      `6. 如果有人吐槽/开玩笑，可以接梗但不要过度`,
+      `7. 如果问技术/编程类问题，可以简单回答但不展开`,
+      `8. 保持斜杆青年的调性：认真的时候很靠谱，轻松的时候很好玩`,
+    ].join('\n');
+    
+    // Build messages array for the API
+    const apiMessages = [
+      { role: 'system', content: clubInfo },
+    ];
+    
+    // Include recent conversation (last 10 exchanges)
+    const recent = aiMessages.slice(-20);
+    for (const m of recent) {
+      if (m.role === 'user' || m.role === 'assistant') {
+        apiMessages.push({ role: m.role, content: m.content });
+      }
+    }
+    
+    // Call AI API
+    const resp = await fetch(AI_API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + AI_API_KEY,
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: apiMessages,
+        max_tokens: 500,
+        temperature: 0.8,
+        top_p: 0.95,
+      }),
+    });
+    
+    hideTyping();
+    
+    if (!resp.ok) {
+      const errText = await resp.text();
+      throw new Error(errText || 'API error');
+    }
+    
+    const data = await resp.json();
+    const reply = data.choices?.[0]?.message?.content || '嗯…我卡壳了，能再问一遍吗？🤔';
+    
+    addBotMsg(reply);
+    
+  } catch (err) {
+    hideTyping();
+    console.error('AI error:', err);
+    // Fallback responses if API fails
+    const fallbacks = [
+      '🤖 我刚走神了一下…你说了啥？要不重来一遍？',
+      '信号有点飘啊…不过你说的话我记着呢，再试一次？',
+      '🌱 斜杠君宕机0.1秒已恢复。你要聊什么来着？',
+    ];
+    addBotMsg(fallbacks[Math.floor(Math.random() * fallbacks.length)]);
+  }
+  
+  sendBtn.disabled = false;
+  document.getElementById('ai-input').focus();
+}
+
+// Helper to get user info from the main app context
+async function getUserInfo() {
+  if (typeof getCurrentUser === 'function') {
+    try { return await getCurrentUser(); } catch(e) { return null; }
+  }
+  return null;
+}
+
+// Close AI panel when clicking outside
+document.addEventListener('click', function(e) {
+  const panel = document.getElementById('ai-panel');
+  const toggle = document.getElementById('ai-toggle');
+  if (panel && panel.classList.contains('open')) {
+    if (!panel.contains(e.target) && !toggle.contains(e.target)) {
+      panel.classList.remove('open');
+      toggle.textContent = '🤖';
+    }
+  }
+});
+</script>
+
 </body>
 </html>
