@@ -1086,7 +1086,7 @@ function renderGallery() {
     const el = document.getElementById('gallery-grid');
     el.innerHTML = GALLERY_IMAGES.map(g => `
         <div class="card-u overflow-hidden cursor-pointer" onclick="openLightbox('${IMG_PATH+g.src}')">
-            <img src="${IMG_PATH+g.src}" alt="${g.title}" style="width:100%;aspect-ratio:4/3;object-fit:cover;transition:transform 0.4s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+            <img src="${IMG_PATH+g.src}" alt="${g.title}" class="gallery-img" style="transition:transform 0.4s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
             <div class="p-3"><div class="text-xs font-medium" style="color:#6b6040;">${g.title}</div></div>
         </div>
     `).join('');
@@ -1096,7 +1096,7 @@ function renderHomeGallery() {
     const el = document.getElementById('home-gallery');
     el.innerHTML = GALLERY_IMAGES.slice(0,8).map(g => `
         <div class="overflow-hidden rounded-xl cursor-pointer" onclick="navigate('gallery')">
-            <img src="${IMG_PATH+g.src}" alt="${g.title}" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:12px;transition:transform 0.4s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+            <img src="${IMG_PATH+g.src}" alt="${g.title}" style="width:100%;max-height:320px;object-fit:contain;border-radius:12px;background:#f5f3f0;transition:transform 0.4s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
         </div>
     `).join('');
 }
@@ -1605,3 +1605,4 @@ document.addEventListener('click', function(e) {
 
 </body>
 </html>
+
