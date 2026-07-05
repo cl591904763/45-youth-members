@@ -1379,8 +1379,8 @@ document.querySelectorAll('.modal-overlay').forEach(el => {
 
 <script>
 // ===== 45°斜杠君 AI 助手 =====
-const AI_API_KEY = 'sk-ws-H.RXXYRYD.gPgC.MEQCIDySKUiglOcB7YWZHnjOjH66woKZb77L8gQeovoElaDwAiA_qFmxKSWo8IDSIYaRhomk_EK5HcIX8QXFxuWppA9DlQ';
-const AI_API_URL = 'https://api.agicto.cn/v1/chat/completions';
+const AI_API_KEY = 'sk-defe48d9e3ed4074930af45244b4313c';
+const AI_API_URL = 'https://api.deepseek.com/v1/chat/completions';
 
 // 社团知识库（斜杠君的知识来源）
 const CLUB_KNOWLEDGE = {
@@ -1545,7 +1545,7 @@ async function sendAI() {
         'Authorization': 'Bearer ' + AI_API_KEY,
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: 'deepseek-chat',
         messages: apiMessages,
         max_tokens: 500,
         temperature: 0.8,
