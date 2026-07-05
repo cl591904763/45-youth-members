@@ -127,7 +127,7 @@
     @keyframes spin { to{transform:rotate(360deg);} }
 
     /* ── Activity detail image slider ── */
-    .slider-img { width:100%; border-radius:16px; object-fit:cover; aspect-ratio:16/9; background:#f5f3f0; }
+    .slider-img { width:100%; border-radius:16px; object-fit:contain; background:#f5f3f0; max-height:360px; }
 
     /* ── Photo gallery grid ── */
     .gallery-img {
@@ -1026,7 +1026,7 @@ function activityCardHTML(a, isPast=false) {
     const imgSrc = a.images && a.images.length > 0 ? IMG_PATH + a.images[0] : '';
     return `
     <div class="card-u overflow-hidden cursor-pointer" onclick="navigate('activity-detail','${a.id}')">
-        ${imgSrc ? `<div style="width:100%;aspect-ratio:16/9;background:#f0ece4;overflow:hidden;"><img src="${imgSrc}" alt="${a.title}" style="width:100%;height:100%;object-fit:cover;transition:transform 0.4s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'"></div>` : ''}
+        ${imgSrc ? `<div style="width:100%;background:#f0ece4;display:flex;align-items:center;justify-content:center;"><img src="${imgSrc}" alt="${a.title}" style="width:100%;object-fit:contain;max-height:340px;transition:transform 0.4s;" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'"></div>` : ''}
         <div class="p-5">
             <div class="flex items-center gap-2 mb-2">
                 <span class="tag-u" style="background:${isPast?'rgba(180,160,140,0.1)':'rgba(45,138,45,0.08)'};color:${isPast?'#8c6040':'#2d8a2d'};">${a.category}</span>
@@ -1050,7 +1050,7 @@ function loadActivityDetail(id) {
     const isExternal = !!a.externalUrl;
     el.innerHTML = `
         <div class="card-u overflow-hidden mb-8">
-            ${images.length > 0 ? `<div style="overflow:hidden;"><img src="${IMG_PATH+images[0]}" alt="${a.title}" style="width:100%;aspect-ratio:16/9;object-fit:cover;"></div>` : ''}
+            ${images.length > 0 ? `<div style="background:#f5f3f0;display:flex;align-items:center;justify-content:center;"><img src="${IMG_PATH+images[0]}" alt="${a.title}" style="width:100%;object-fit:contain;max-height:480px;"></div>` : ''}
             <div class="p-6 sm:p-8">
                 <div class="flex items-center gap-3 mb-4">
                     <span class="tag-u" style="background:rgba(45,138,45,0.08);color:#2d8a2d;">${a.category}</span>
