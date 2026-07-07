@@ -942,53 +942,58 @@ async function loadActivitiesFromDB() {
           merged.push(fa);
         }
       });
-      ACTIVITIES = merged;
+      // Sort DB activities: newest created_at first, exclude gallery type
+      merged.sort((a, b) => {
+        if (a.type === '_gallery') return 1;
+        if (b.type === '_gallery') return -1;
+        const aT = String(a.created_at || a.date || '');
+        const bT = String(b.created_at || b.date || '');
+        return bT.localeCompare(aT);
+      });
+      ACTIVITIES = merged.filter(a => a.type !== '_gallery');
     } else {
       throw new Error('DB empty or no data');
     }
   } catch(err) {
     console.warn('load activities from DB failed, using fallback:', err.message);
-    ACTIVITIES = FALLBACK_ACTIVITIES;
+    ACTIVITIES = FALLBACK_ACTIVITIES.slice().sort((a, b) => String(b.created_at || b.date || '').localeCompare(String(a.created_at || a.date || '')));
   }
   return ACTIVITIES;
 }
 
-// Load gallery images from BAAS DB
+// Load gallery images from BAAS DB (stored in activities table, type='_gallery')
 async function loadGalleryFromDB() {
   try {
-    const res = await client.db.from('activity_images').list();
+    const res = await client.db.from('activities').list();
     if (res.success && Array.isArray(res.data) && res.data.length > 0) {
-      const all = res.data;
-      const dbImages = all
-        .filter(img => img.image_url)
-        .sort((a, b) => (a.sort_order || 999) - (b.sort_order || 999))
+      function resolveGF(v) {
+        if (v == null) return '';
+        if (typeof v === 'string') return v;
+        if (Array.isArray(v) && v.length > 0 && typeof v[0].url === 'string') return v[0].url;
+        return '';
+      }
+      const dbImages = res.data
+        .filter(a => a.type === '_gallery' && a.cover_image)
+        .sort((a, b) => String(b.created_at || '').localeCompare(String(a.created_at || '')))
         .map(img => ({
-          src: String(img.image_url || ''),
+          src: resolveGF(img.cover_image),
           title: img.title || '影像',
-          id: img.id
+          id: img.id,
+          category: img.category || 'gallery'
         }));
-      // Merge: DB images first, then fallback images that aren't duplicate src/title
-      const dbSrcs = new Set(dbImages.map(i => i.src));
-      const fallbackByTitle = {};
-      FALLBACK_GALLERY.forEach(fg => { fallbackByTitle[fg.title] = fg; });
+      // Merge: DB images first, then fallback images by title dedup
+      const dbTitles = new Set(dbImages.map(i => i.title));
       const merged = [...dbImages];
-      // Patch DB images missing src from fallback
-      merged.forEach(m => {
-        const fb = fallbackByTitle[m.title];
-        if (fb && !m.src) m.src = fb.src;
-      });
       FALLBACK_GALLERY.forEach(fg => {
-        if (!dbSrcs.has(fg.src)) {
-          merged.push(fg);
-        }
+        if (!dbTitles.has(fg.title)) merged.push(fg);
       });
       GALLERY_IMAGES = merged;
     } else {
-      GALLERY_IMAGES = FALLBACK_GALLERY;
+      GALLERY_IMAGES = [...FALLBACK_GALLERY];
     }
   } catch(err) {
     console.warn('load gallery from DB failed:', err.message);
-    GALLERY_IMAGES = FALLBACK_GALLERY;
+    GALLERY_IMAGES = [...FALLBACK_GALLERY];
   }
   return GALLERY_IMAGES;
 }
@@ -1628,10 +1633,17 @@ async function seedDefaultActivities() {
 async function addDefaultImages() {
   for (const img of DEFAULT_IMAGES) {
     try {
-      const existing = await client.db.from('activity_images').list();
-      const dup = Array.isArray(existing.data) && existing.data.some(i => i.image_url === img.image_url);
+      const existing = await client.db.from('activities').list();
+      const dup = Array.isArray(existing.data) && existing.data.some(a => a.title === img.title && a.type === '_gallery');
       if (!dup) {
-        await client.db.from('activity_images').insert().set({ ...img, created_at: new Date().toISOString().slice(0,19).replace('T', ' ') })._execute();
+        await client.db.from('activities').insert().set({
+          title: img.title,
+          cover_image: img.image_url,
+          type: '_gallery',
+          category: img.image_type || 'gallery',
+          sort_order: img.sort_order || 0,
+          created_at: new Date().toISOString().slice(0,19).replace('T', ' ')
+        })._execute();
       }
     } catch(e) { /* skip dupes */ }
   }
@@ -1805,9 +1817,22 @@ async function loadImages() {
   const grid = document.getElementById('admin-image-grid');
   grid.innerHTML = '<div class="col-span-full p-8 text-center"><div class="spinner-u"></div></div>';
   try {
-    const res = await client.db.from('activity_images').list();
+    const res = await client.db.from('activities').list();
     if (res.success && res.data) {
-      adminImages = Array.isArray(res.data) ? res.data : [];
+      function resolveBAASField(v) {
+        if (v == null) return '';
+        if (typeof v === 'string') return v;
+        if (Array.isArray(v) && v.length > 0 && typeof v[0].url === 'string') return v[0].url;
+        return '';
+      }
+      adminImages = (Array.isArray(res.data) ? res.data : [])
+        .filter(a => a.type === '_gallery')
+        .map(a => ({
+          ...a,
+          image_url: resolveBAASField(a.cover_image),
+          image_type: a.category || 'gallery'
+        }));
+      adminImages.sort((a, b) => String(b.created_at || '').localeCompare(String(a.created_at || '')));
       renderImageGrid();
     } else {
       grid.innerHTML = '<div class="col-span-full p-8 text-center" style="color:#a09070;">暂无影像数据</div>';
@@ -1898,11 +1923,21 @@ async function saveImage(e) {
   const btn = document.getElementById('image-save-btn');
   btn.textContent = '保存中...'; btn.disabled = true;
   try {
+    // Gallery images stored in activities table (type='_gallery')
+    const galleryData = {
+      title: data.title,
+      cover_image: data.image_url,
+      type: '_gallery',
+      category: data.image_type || 'gallery',
+      sort_order: data.sort_order || 0,
+      activity_id: data.activity_id || null
+    };
     let res;
     if (id) {
-      res = await client.db.from('activity_images').update().set(data)._addFilter('id', 'eq', id)._execute();
+      galleryData.created_at = new Date().toISOString().slice(0,19).replace('T', ' ');
+      res = await client.db.from('activities').update().set(galleryData)._addFilter('id', 'eq', id)._execute();
     } else {
-      res = await insertInto('activity_images', data);
+      res = await insertInto('activities', galleryData);
     }
     toast(id ? '影像已更新 ✅' : '影像已添加 ✅');
     closeModal('image-modal');
@@ -1922,7 +1957,7 @@ function editImage(id) {
 async function deleteImage(id) {
   if (!confirm('确定要删除这张影像吗？')) return;
   try {
-    await deleteByEq('activity_images', 'id', id);
+    await deleteByEq('activities', 'id', id);
     toast('影像已删除');
     loadImages();
   } catch(err) {
