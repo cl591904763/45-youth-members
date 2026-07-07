@@ -902,15 +902,24 @@ async function loadActivitiesFromDB() {
   try {
     const res = await client.db.from('activities').list();
     if (res.success && Array.isArray(res.data) && res.data.length > 0) {
-      ACTIVITIES = res.data.map(a => ({
+      // Normalize DB activities
+      const dbActivities = res.data.map(a => ({
         ...a,
-        // normalize all fields to safe types (BAAS may return numbers)
         cover_image: String(a.cover_image || ''),
         media: String(a.media || ''),
         images: (String(a.media || '')).split(',').filter(Boolean).map(s => s.trim()),
         detail: String(a.content || a.summary || ''),
         externalUrl: String(a.external_url || '')
       }));
+      // Merge: DB activities first, then fallback activities that aren't duplicate titles
+      const dbTitles = new Set(dbActivities.map(a => a.title));
+      const merged = [...dbActivities];
+      FALLBACK_ACTIVITIES.forEach(fa => {
+        if (!dbTitles.has(fa.title)) {
+          merged.push(fa);
+        }
+      });
+      ACTIVITIES = merged;
     } else {
       throw new Error('DB empty or no data');
     }
@@ -927,7 +936,7 @@ async function loadGalleryFromDB() {
     const res = await client.db.from('activity_images').list();
     if (res.success && Array.isArray(res.data) && res.data.length > 0) {
       const all = res.data;
-      GALLERY_IMAGES = all
+      const dbImages = all
         .filter(img => img.image_url)
         .sort((a, b) => (a.sort_order || 999) - (b.sort_order || 999))
         .map(img => ({
@@ -935,6 +944,15 @@ async function loadGalleryFromDB() {
           title: img.title || '影像',
           id: img.id
         }));
+      // Merge: DB images first, then fallback images that aren't duplicate src
+      const dbSrcs = new Set(dbImages.map(i => i.src));
+      const merged = [...dbImages];
+      FALLBACK_GALLERY.forEach(fg => {
+        if (!dbSrcs.has(fg.src)) {
+          merged.push(fg);
+        }
+      });
+      GALLERY_IMAGES = merged;
     } else {
       GALLERY_IMAGES = FALLBACK_GALLERY;
     }
@@ -965,36 +983,33 @@ function createFileInput(callback) {
 }
 
 async function uploadFileToBAAS(file, callback) {
-  const toastEl = toast('上传中...', 'info');
+  toast('上传中...', 'info');
   try {
-    // Use native BAAS file upload (FormData via client.storage.upload())
     const res = await client.storage.upload().file(file);
     
-    let url;
-    if (res && res.success && res.data) {
-      url = res.data;
-      // If it returns a relative path, prepend IMG_PATH
-      if (typeof url === 'string' && !url.startsWith('http') && !url.startsWith('data:') && !url.startsWith('/')) {
-        url = IMG_PATH + url;
+    let url = '';
+    // BAAS storage upload returns {success, data: {url,id,...}} or {success, data: 'url_string'}
+    if (res && res.success) {
+      if (typeof res.data === 'string') {
+        url = res.data;
+      } else if (res.data && typeof res.data.url === 'string') {
+        url = res.data.url;
+      } else if (res.data && res.data.path) {
+        url = res.data.path;
       }
-    } else if (res && typeof res.data === 'string') {
-      url = res.data;
-    } else {
-      // Fallback: read as data URL
-      const dataUrl = await new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
-      });
-      url = dataUrl;
+    }
+    
+    if (!url) {
+      console.error('upload BAAS response format unexpected:', res);
+      toast('上传失败：服务器返回格式异常', 'error');
+      return;
     }
     
     toast('上传成功 ✅');
     if (callback) callback(url);
   } catch(err) {
     console.error('upload error:', err);
-    toast('上传失败，请检查网络或重试', 'error');
+    toast('上传失败：' + (err.message||'请检查网络'), 'error');
   }
 }
 
@@ -1070,10 +1085,10 @@ function navigate(page, params) {
     // Page-specific init
     if (page === 'admin') checkAdminAuth();
     if (page === 'user' || page === 'join') loadUserState();
-    if (page === 'activities') renderActivityCards();
-    if (page === 'gallery') renderGallery();
-    if (page === 'home') renderHomeActivities();
-    if (page === 'activity-detail' && params) loadActivityDetail(params);
+    if (page === 'activities') { loadActivitiesFromDB().then(renderActivityCards).catch(()=>renderActivityCards()); }
+    if (page === 'gallery') { loadGalleryFromDB().then(renderGallery).catch(()=>renderGallery()); }
+    if (page === 'home') { loadActivitiesFromDB().then(renderHomeActivities).catch(()=>renderHomeActivities()); }
+    if (page === 'activity-detail' && params) { loadActivitiesFromDB().then(()=>loadActivityDetail(params)).catch(()=>loadActivityDetail(params)); }
 }
 
 // Handle hash on load
