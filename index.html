@@ -935,8 +935,8 @@ async function loadGalleryFromDB() {
         }));
     }
   } catch(err) {
-    console.warn('load gallery from DB failed:', err);
-    GALLERY_IMAGES = [];
+    console.warn('load gallery from DB failed:', err.message);
+    GALLERY_IMAGES = FALLBACK_GALLERY;
   }
   return GALLERY_IMAGES;
 }
@@ -1260,18 +1260,48 @@ function registerForActivity(activityId) {
 
 // ===== ACTIVITIES RENDER =====
 function renderHomeActivities() {
+  try {
     const el = document.getElementById('home-activities');
+    if (!el) return;
     const up = ACTIVITIES.filter(a => a.type === 'upcoming').slice(0,3);
     el.innerHTML = up.map(a => activityCardHTML(a)).join('');
+  } catch(e) { console.error('renderHomeActivities error:', e); }
 }
 
 function renderActivityCards() {
+  try {
     const upEl = document.getElementById('activities-upcoming');
     const pastEl = document.getElementById('activities-past');
     const up = ACTIVITIES.filter(a => a.type === 'upcoming');
     const past = ACTIVITIES.filter(a => a.type === 'past');
-    upEl.innerHTML = up.map(a => activityCardHTML(a)).join('');
-    pastEl.innerHTML = past.map(a => activityCardHTML(a, true)).join('');
+    if (upEl) upEl.innerHTML = up.map(a => activityCardHTML(a)).join('');
+    if (pastEl) pastEl.innerHTML = past.map(a => activityCardHTML(a, true)).join('');
+  } catch(e) { console.error('renderActivityCards error:', e); }
+}
+
+function renderGallery() {
+  try {
+    const el = document.getElementById('gallery-grid');
+    if (!el) return;
+    el.innerHTML = GALLERY_IMAGES.map(g => `
+        <div class="card-u overflow-hidden cursor-pointer" onclick="openLightbox('${escAttr(resolveImgSrc(g.src))}')">
+            <img src="${resolveImgSrc(g.src)}" alt="${g.title}" class="gallery-img" style="transition:transform 0.4s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+            <div class="p-3"><div class="text-xs font-medium" style="color:#6b6040;">${escHtml(g.title)}</div></div>
+        </div>
+    `).join('');
+  } catch(e) { console.error('renderGallery error:', e); }
+}
+
+function renderHomeGallery() {
+  try {
+    const el = document.getElementById('home-gallery');
+    if (!el) return;
+    el.innerHTML = GALLERY_IMAGES.slice(0,8).map(g => `
+        <div class="overflow-hidden rounded-xl cursor-pointer" onclick="navigate('gallery')">
+            <img src="${resolveImgSrc(g.src)}" alt="${escHtml(g.title)}" style="width:100%;max-height:320px;object-fit:contain;border-radius:12px;background:#f5f3f0;transition:transform 0.4s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+        </div>
+    `).join('');
+  } catch(e) { console.error('renderHomeGallery error:', e); }
 }
 
 function resolveImgSrc(raw) {
@@ -1284,21 +1314,23 @@ function resolveImgSrc(raw) {
 }
 
 function getFirstImage(a) {
+  if (!a || typeof a !== 'object') return '';
   if (a.cover_image) return resolveImgSrc(a.cover_image);
-  if (a.images && a.images.length) return resolveImgSrc(Array.isArray(a.images) ? a.images[0] : a.images.split(',')[0]);
-  if (a.media) return resolveImgSrc(a.media.split(',')[0]);
+  if (a.images && a.images.length) return resolveImgSrc(Array.isArray(a.images) ? a.images[0] : String(a.images).split(',')[0]);
+  if (a.media) return resolveImgSrc(String(a.media).split(',')[0]);
   return '';
 }
 
 function getImageList(a) {
+  if (!a || typeof a !== 'object') return [];
   const list = [];
   if (a.cover_image) list.push(resolveImgSrc(a.cover_image));
   if (a.images) {
-    const imgs = Array.isArray(a.images) ? a.images : a.images.split(',');
-    imgs.forEach(s => { if (s.trim()) list.push(resolveImgSrc(s.trim())); });
+    const imgs = Array.isArray(a.images) ? a.images : String(a.images).split(',');
+    imgs.forEach(s => { if (s && s.trim()) list.push(resolveImgSrc(s.trim())); });
   }
   if (a.media) {
-    a.media.split(',').forEach(s => { if (s.trim()) list.push(resolveImgSrc(s.trim())); });
+    String(a.media).split(',').forEach(s => { if (s && s.trim()) list.push(resolveImgSrc(s.trim())); });
   }
   return list;
 }
@@ -1361,26 +1393,6 @@ function loadActivityDetail(id) {
         </div>
     `;
     window.scrollTo({top:0});
-}
-
-// ===== GALLERY =====
-function renderGallery() {
-    const el = document.getElementById('gallery-grid');
-    el.innerHTML = GALLERY_IMAGES.map(g => `
-        <div class="card-u overflow-hidden cursor-pointer" onclick="openLightbox('${resolveImgSrc(g.src)}')">
-            <img src="${resolveImgSrc(g.src)}" alt="${g.title}" class="gallery-img" style="transition:transform 0.4s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
-            <div class="p-3"><div class="text-xs font-medium" style="color:#6b6040;">${g.title}</div></div>
-        </div>
-    `).join('');
-}
-
-function renderHomeGallery() {
-    const el = document.getElementById('home-gallery');
-    el.innerHTML = GALLERY_IMAGES.slice(0,8).map(g => `
-        <div class="overflow-hidden rounded-xl cursor-pointer" onclick="navigate('gallery')">
-            <img src="${resolveImgSrc(g.src)}" alt="${g.title}" style="width:100%;max-height:320px;object-fit:contain;border-radius:12px;background:#f5f3f0;transition:transform 0.4s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
-        </div>
-    `).join('');
 }
 
 function openLightbox(src) {
@@ -1829,17 +1841,23 @@ document.addEventListener('DOMContentLoaded', async () => {
     const hash = location.hash.replace('#/', '') || 'home';
     navigate(hash);
     // Load data from DB, then render
-    await Promise.all([
-      loadActivitiesFromDB().then(() => {
-        renderHomeActivities();
-        renderActivityCards();
-      }),
-      loadGalleryFromDB().then(() => {
-        renderHomeGallery();
-        renderGallery();
-      }),
-      loadUserState()
-    ]);
+    try {
+      await loadActivitiesFromDB();
+    } catch(e) { console.warn('init loadActivities failed:', e); }
+    try {
+      renderHomeActivities();
+      renderActivityCards();
+    } catch(e) { console.error('render activities failed:', e); }
+    try {
+      await loadGalleryFromDB();
+    } catch(e) { console.warn('init loadGallery failed:', e); }
+    try {
+      renderHomeGallery();
+      renderGallery();
+    } catch(e) { console.error('render gallery failed:', e); }
+    try {
+      await loadUserState();
+    } catch(e) { console.warn('init loadUser failed:', e); }
 });
 
 // Close modals on overlay click
@@ -2119,6 +2137,10 @@ function escHtml(s) {
   const d = document.createElement('div');
   d.textContent = s;
   return d.innerHTML;
+}
+
+function escAttr(s) {
+  return String(s).replace(/'/g, '&#39;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
 function markedText(text) {
