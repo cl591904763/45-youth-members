@@ -904,13 +904,20 @@ async function loadActivitiesFromDB() {
     const res = await client.db.from('activities').list();
     if (res.success && Array.isArray(res.data) && res.data.length > 0) {
       // Normalize DB activities
+      function resolveBAASField(v) {
+        // BAAS file resource fields: stored as [{url:'...', resource_id:...}] or plain string
+        if (v == null) return '';
+        if (typeof v === 'string') return v;
+        if (Array.isArray(v) && v.length > 0 && typeof v[0].url === 'string') return v[0].url;
+        return '';
+      }
       const dbActivities = res.data.map(a => ({
         ...a,
-        cover_image: (function(v){ v = String(v||''); return (v === '[object Object]' || v === 'undefined' || v === 'null') ? '' : v; })(a.cover_image),
-        media: (function(v){ v = String(v||''); return (v === '[object Object]' || v === 'undefined' || v === 'null') ? '' : v; })(a.media),
+        cover_image: resolveBAASField(a.cover_image),
+        media: resolveBAASField(a.media) || (function(v){ v = String(v||''); return (v === '[object Object]' || v === 'undefined' || v === 'null') ? '' : v; })(a.media),
         images: (String(a.media || '')).split(',').filter(Boolean).map(s => s.trim()),
         detail: String(a.content || a.summary || ''),
-        externalUrl: (function(v){ v = String(v||''); return (v === '[object Object]' || v === 'undefined' || v === 'null') ? '' : v; })(a.external_url || '')
+        externalUrl: (typeof a.external_url === 'string') ? a.external_url : ''
       }));
       // Merge: DB activities first, then fallback activities that aren't duplicate titles
       const dbTitles = new Set(dbActivities.map(a => a.title));
@@ -1639,11 +1646,17 @@ async function loadActivities() {
   try {
     const res = await client.db.from('activities').list();
     if (res.success && res.data) {
+      function resolveBAASField(v) {
+        if (v == null) return '';
+        if (typeof v === 'string') return v;
+        if (Array.isArray(v) && v.length > 0 && typeof v[0].url === 'string') return v[0].url;
+        return '';
+      }
       let raw = (Array.isArray(res.data) ? res.data : []).map(a => ({
         ...a,
-        cover_image: (function(v){ v = String(v||''); return (v==='[object Object]'||v==='undefined'||v==='null')?'':v; })(a.cover_image),
-        media: (function(v){ v = String(v||''); return (v==='[object Object]'||v==='undefined'||v==='null')?'':v; })(a.media),
-        external_url: (function(v){ v = String(v||''); return (v==='[object Object]'||v==='undefined'||v==='null')?'':v; })(a.external_url||'')
+        cover_image: resolveBAASField(a.cover_image),
+        media: resolveBAASField(a.media) || String(a.media||''),
+        external_url: (typeof a.external_url === 'string') ? a.external_url : ''
       }));
       // Patch empty cover/media from FALLBACK by title match
       const fbByTitle = {}; FALLBACK_ACTIVITIES.forEach(fa => { fbByTitle[fa.title] = fa; });
