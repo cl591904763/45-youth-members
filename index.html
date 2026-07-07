@@ -965,22 +965,16 @@ async function loadActivitiesFromDB() {
   return ACTIVITIES;
 }
 
-// Load gallery images from BAAS DB (stored in activities table, type='_gallery')
+// Load gallery images from BAAS DB (stored in activities table, type='_gallery', image_url in external_url)
 async function loadGalleryFromDB() {
   try {
     const res = await client.db.from('activities').list();
     if (res.success && Array.isArray(res.data) && res.data.length > 0) {
-      function resolveGF(v) {
-        if (v == null) return '';
-        if (typeof v === 'string') return v;
-        if (Array.isArray(v) && v.length > 0 && typeof v[0].url === 'string') return v[0].url;
-        return '';
-      }
       const dbImages = res.data
-        .filter(a => a.type === '_gallery' && a.cover_image)
+        .filter(a => a.type === '_gallery' && a.external_url)
         .sort((a, b) => String(b.created_at || '').localeCompare(String(a.created_at || '')))
         .map(img => ({
-          src: resolveGF(img.cover_image),
+          src: String(img.external_url || ''),
           title: img.title || '影像',
           id: img.id,
           category: img.category || 'gallery'
@@ -1642,7 +1636,7 @@ async function addDefaultImages() {
       if (!dup) {
         await client.db.from('activities').insert().set({
           title: img.title,
-          cover_image: img.image_url,
+          external_url: img.image_url,
           type: '_gallery',
           category: img.image_type || 'gallery',
           sort_order: img.sort_order || 0,
@@ -1838,7 +1832,7 @@ async function loadImages() {
         .filter(a => a.type === '_gallery')
         .map(a => ({
           ...a,
-          image_url: resolveBAASField(a.cover_image),
+          image_url: String(a.external_url || ''),
           image_type: a.category || 'gallery'
         }));
       adminImages.sort((a, b) => String(b.created_at || '').localeCompare(String(a.created_at || '')));
@@ -1932,10 +1926,10 @@ async function saveImage(e) {
   const btn = document.getElementById('image-save-btn');
   btn.textContent = '保存中...'; btn.disabled = true;
   try {
-    // Gallery images stored in activities table (type='_gallery')
+    // Gallery images stored in activities table (type='_gallery', image_url in external_url)
     const galleryData = {
       title: data.title,
-      cover_image: data.image_url,
+      external_url: data.image_url,
       type: '_gallery',
       category: data.image_type || 'gallery',
       sort_order: data.sort_order || 0,
