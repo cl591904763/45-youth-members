@@ -905,11 +905,11 @@ async function loadActivitiesFromDB() {
       // Normalize DB activities
       const dbActivities = res.data.map(a => ({
         ...a,
-        cover_image: String(a.cover_image || ''),
-        media: String(a.media || ''),
+        cover_image: (function(v){ v = String(v||''); return (v === '[object Object]' || v === 'undefined' || v === 'null') ? '' : v; })(a.cover_image),
+        media: (function(v){ v = String(v||''); return (v === '[object Object]' || v === 'undefined' || v === 'null') ? '' : v; })(a.media),
         images: (String(a.media || '')).split(',').filter(Boolean).map(s => s.trim()),
         detail: String(a.content || a.summary || ''),
-        externalUrl: String(a.external_url || '')
+        externalUrl: (function(v){ v = String(v||''); return (v === '[object Object]' || v === 'undefined' || v === 'null') ? '' : v; })(a.external_url || '')
       }));
       // Merge: DB activities first, then fallback activities that aren't duplicate titles
       const dbTitles = new Set(dbActivities.map(a => a.title));
