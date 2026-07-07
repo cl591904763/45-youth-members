@@ -1469,12 +1469,22 @@ function openLightbox(src) {
 function closeLightbox() { document.getElementById('lightbox').classList.add('hidden'); }
 
 // ===== ADMIN =====
-function verifyAdminPin(e) {
+async function verifyAdminPin(e) {
     e.preventDefault();
     const pin = document.getElementById('admin-pin-input').value;
     if (pin !== ADMIN_PIN) {
         toast('密钥错误', 'error');
         return;
+    }
+    // Auto-login BAAS admin for DB writes (insert/update/delete require auth)
+    try {
+        try { await client.auth.register({phone:'13900000000', password:'admin888', name:'管理员'}); } catch(_) {}
+        const loginRes = await client.auth.login({phone:'13900000000', password:'admin888'});
+        if (loginRes && loginRes.success) {
+            console.log('BAAS admin login OK');
+        }
+    } catch(err) {
+        console.warn('BAAS admin login failed, DB writes disabled:', err.message);
     }
     loadAdminData();
 }
