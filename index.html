@@ -1597,7 +1597,7 @@ async function seedDefaultActivities() {
       const existing = await client.db.from('activities').list();
       const dup = Array.isArray(existing.data) && existing.data.some(a => a.title === act.title);
       if (!dup) {
-        await client.db.from('activities').insert().set({ ...act, created_at: new Date().toISOString().slice(0,19).replace('T', ' ') });
+        await client.db.from('activities').insert().set({ ...act, created_at: new Date().toISOString().slice(0,19).replace('T', ' ') })._execute();
         count++;
       }
     } catch(e) { console.warn('seed activity err:', e); }
@@ -1614,7 +1614,7 @@ async function addDefaultImages() {
       const existing = await client.db.from('activity_images').list();
       const dup = Array.isArray(existing.data) && existing.data.some(i => i.image_url === img.image_url);
       if (!dup) {
-        await client.db.from('activity_images').insert().set({ ...img, created_at: new Date().toISOString().slice(0,19).replace('T', ' ') });
+        await client.db.from('activity_images').insert().set({ ...img, created_at: new Date().toISOString().slice(0,19).replace('T', ' ') })._execute();
       }
     } catch(e) { /* skip dupes */ }
   }
@@ -1711,10 +1711,15 @@ async function deleteByEq(table, column, value) {
   return await builder._execute();
 }
 
-// Helper: insert with data (SDK requires .set() chain)
+// Helper: insert with data (SDK requires .set() + ._execute() chain)
 async function insertInto(table, data) {
   data.created_at = new Date().toISOString().slice(0,19).replace('T', ' ');
-  return await client.db.from(table).insert().set(data);
+  return await client.db.from(table).insert().set(data)._execute();
+}
+
+async function updateActivity(id, data) {
+  data.created_at = new Date().toISOString().slice(0,19).replace('T', ' ');
+  return await client.db.from('activities').update().set(data)._addFilter('id', 'eq', id)._execute();
 }
 
 async function saveActivity(e) {
