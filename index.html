@@ -856,7 +856,44 @@ const IMG_PATH = 'images/';
 // ===== CLIENT =====
 const client = aipexbase.createClient({ baseUrl: BASE_URL, apiKey: API_KEY });
 
-// ===== ACTIVITY DATA (dynamic from DB) =====
+// ===== HARDCODED FALLBACK DATA (used when DB is empty/unavailable) =====
+const FALLBACK_ACTIVITIES = [
+  { id:'fallback-1', title:'0元60天·公益融合艺术节', summary:'废弃地下家具城改造为艺术空间，招募策展人/艺术家/志愿者，共同打造一场前所未有的公益融合艺术节。', content:'这是一个为期60天的公益艺术实验。我们将废弃的地下家具城改造为全新的艺术空间，邀请策展人、艺术家、设计师和志愿者共同参与。从空间改造到展览策划，从工作坊到开幕活动——全程共创，打造属于青年群体的融合艺术IP。\n\n招募对象：\n- 策展人/助理策展人\n- 视觉/空间艺术家\n- 志愿者（布展、导览、摄影）\n- 活动策划执行', date:'2026-08-01', location:'上海·康健商务广场·1号楼地一层', category:'活动', type:'upcoming', status:'published', cover_image:'images/artfest_recruit_poster.jpg', media:'images/artfest_underground.jpg,images/artfest_neon_poster.jpg,images/artfest_staff_vest.jpg', external_url:'https://cl591904763.github.io/zero-art-festival/', images:['images/artfest_recruit_poster.jpg','images/artfest_underground.jpg','images/artfest_neon_poster.jpg','images/artfest_staff_vest.jpg'] },
+  { id:'fallback-2', title:'青年夜校：无障碍设计入门', summary:'四期课程，从意识唤醒到实操设计思维，了解无障碍设计的核心理念', content:'青年夜校系列课程——无障碍设计入门。\n\n课程安排：\n第1讲：无障碍设计概论（意识唤醒）\n第2讲：包容性设计思维\n第3讲：物理空间无障碍改造\n第4讲：数字产品无障碍实践\n\n每期课程约2小时，含互动工作坊环节。', date:'2026-07-20', location:'上海·静安区', category:'培训', type:'upcoming', status:'published', cover_image:'images/pdf_p06_3.jpeg', media:'images/pdf_p06_4.jpeg,images/pdf_p06_5.jpeg,images/pdf_p06_6.jpeg', images:['images/pdf_p06_3.jpeg','images/pdf_p06_4.jpeg','images/pdf_p06_5.jpeg','images/pdf_p06_6.jpeg'] },
+  { id:'fallback-3', title:'志愿者赋能工作坊', summary:'融合活动中的沟通技巧与无障碍服务实践', content:'面向志愿者的赋能工作坊，内容涵盖：\n- 与视障/听障人士的沟通技巧\n- 轮椅助行与导盲随行\n- 融合活动中的角色分工\n- 真实案例分享与模拟演练\n\n完成工作坊可获得志愿者赋能证书。', date:'2026-07-28', location:'上海·徐汇区', category:'培训', type:'upcoming', status:'published', cover_image:'images/pdf_p02_2.jpeg', media:'images/pdf_p14_5.jpeg,images/pdf_p18_3.jpeg', images:['images/pdf_p02_2.jpeg','images/pdf_p14_5.jpeg','images/pdf_p18_3.jpeg'] },
+  { id:'fallback-4', title:'2026全国助残日主题快闪', summary:'"保障平等权益，促进融合发展"街头公益行动', content:'2026年全国助残日，我们在外滩发起街头公益快闪行动。通过互动体验装置、融合表演和公益市集，让更多人了解无障碍的重要性和包容性社会的价值。', date:'2026-05-17', location:'上海·外滩', category:'活动', type:'past', status:'published', cover_image:'images/pdf_p10_5.jpeg', media:'images/pdf_p12_7.jpeg,images/pdf_p12_8.jpeg', images:['images/pdf_p10_5.jpeg','images/pdf_p12_7.jpeg','images/pdf_p12_8.jpeg'] },
+  { id:'fallback-5', title:'无障碍城市徒步', summary:'轮椅体验+盲道行走，感受城市无障碍设施现状', content:'用脚步丈量城市无障碍。参与者分组体验：\n- 轮椅组：坐在轮椅上完成1公里城市路线\n- 盲杖组：佩戴眼罩，使用盲杖行走\n- 观察组：记录无障碍设施的问题与亮点\n\n结束后进行复盘分享，形成一份"城市无障碍体验报告"。', date:'2026-04-15', location:'上海·浦东', category:'实践', type:'past', status:'published', cover_image:'images/pdf_p09_3.jpeg', media:'images/pdf_p09_4.jpeg,images/pdf_p09_5.jpeg', images:['images/pdf_p09_3.jpeg','images/pdf_p09_4.jpeg','images/pdf_p09_5.jpeg'] },
+  { id:'fallback-6', title:'情景思政课：包容性社会', summary:'以戏剧教育形式探讨残健融合与社会包容', content:'创新的思政教育形式——通过戏剧教育、角色扮演和情景模拟，让青年学生在沉浸式体验中理解包容性社会的意义，探讨残健融合的实践路径。', date:'2026-03-22', location:'上海·高校', category:'培训', type:'past', status:'published', cover_image:'images/pdf_p10_3.jpeg', media:'images/pdf_p10_4.jpeg,images/pdf_p14_7.jpeg', images:['images/pdf_p10_3.jpeg','images/pdf_p10_4.jpeg','images/pdf_p14_7.jpeg'] },
+];
+
+const FALLBACK_GALLERY = [
+  { src:'images/artfest_recruit_poster.jpg', title:'融合艺术节·招募海报' },
+  { src:'images/artfest_underground.jpg', title:'废弃家具城改造现场' },
+  { src:'images/artfest_neon_poster.jpg', title:'艺术节·没钱也能赢' },
+  { src:'images/artfest_staff_vest.jpg', title:'45°青年志愿者' },
+  { src:'images/pdf_p10_5.jpeg', title:'团队合影' },
+  { src:'images/pdf_p12_7.jpeg', title:'无以伦比·轮椅跑' },
+  { src:'images/pdf_p12_8.jpeg', title:'45°青年集结' },
+  { src:'images/pdf_p09_3.jpeg', title:'志愿者蓝马甲' },
+  { src:'images/pdf_p09_4.jpeg', title:'畅行计划展板' },
+  { src:'images/pdf_p09_5.jpeg', title:'三民文化村合影' },
+  { src:'images/pdf_p13_3.jpeg', title:'羽毛球互动' },
+  { src:'images/pdf_p07_2.jpeg', title:'城市无障碍徒步' },
+  { src:'images/pdf_p14_5.jpeg', title:'轮椅助行' },
+  { src:'images/pdf_p14_7.jpeg', title:'青年中心' },
+  { src:'images/pdf_p14_8.jpeg', title:'45°青年空间' },
+  { src:'images/pdf_p15_7.jpeg', title:'高校助残联盟' },
+  { src:'images/pdf_p18_3.jpeg', title:'轮椅跑预热' },
+  { src:'images/pdf_p18_4.jpeg', title:'ART设计' },
+  { src:'images/pdf_p22_2.jpeg', title:'青年中心外景' },
+  { src:'images/pdf_p10_3.jpeg', title:'青年交流会' },
+  { src:'images/pdf_p10_4.jpeg', title:'沙龙讨论' },
+  { src:'images/pdf_p03_3.jpeg', title:'团队共创' },
+  { src:'images/pdf_p08_6.jpeg', title:'工作坊协作' },
+  { src:'images/pdf_p13_6.jpeg', title:'公益市集' },
+];
+
+// ===== ACTIVITY DATA (load from DB, fallback to hardcoded) =====
 let ACTIVITIES = [];
 let GALLERY_IMAGES = [];
 
@@ -864,12 +901,20 @@ let GALLERY_IMAGES = [];
 async function loadActivitiesFromDB() {
   try {
     const res = await client.db.from('activities').list();
-    if (res.success && res.data) {
-      ACTIVITIES = Array.isArray(res.data) ? res.data : [];
+    if (res.success && Array.isArray(res.data) && res.data.length > 0) {
+      ACTIVITIES = res.data.map(a => ({
+        ...a,
+        // normalize images array for backward compat
+        images: (a.media || '').split(',').filter(Boolean).map(s => s.trim()),
+        detail: a.content || a.summary,
+        externalUrl: a.external_url
+      }));
+    } else {
+      throw new Error('DB empty or no data');
     }
   } catch(err) {
-    console.warn('load activities from DB failed, using fallback:', err);
-    ACTIVITIES = [];
+    console.warn('load activities from DB failed, using fallback:', err.message);
+    ACTIVITIES = FALLBACK_ACTIVITIES;
   }
   return ACTIVITIES;
 }
@@ -878,8 +923,8 @@ async function loadActivitiesFromDB() {
 async function loadGalleryFromDB() {
   try {
     const res = await client.db.from('activity_images').list();
-    if (res.success && res.data) {
-      const all = Array.isArray(res.data) ? res.data : [];
+    if (res.success && Array.isArray(res.data) && res.data.length > 0) {
+      const all = res.data;
       GALLERY_IMAGES = all
         .filter(img => img.image_url)
         .sort((a, b) => (a.sort_order || 999) - (b.sort_order || 999))
@@ -918,8 +963,8 @@ function createFileInput(callback) {
 async function uploadFileToBAAS(file, callback) {
   const toastEl = toast('上传中...', 'info');
   try {
-    // Use native BAAS file upload (FormData via client.upload())
-    const res = await client.upload().file(file);
+    // Use native BAAS file upload (FormData via client.storage.upload())
+    const res = await client.storage.upload().file(file);
     
     let url;
     if (res && res.success && res.data) {
@@ -1481,7 +1526,7 @@ async function seedDefaultActivities() {
       const existing = await client.db.from('activities').list();
       const dup = Array.isArray(existing.data) && existing.data.some(a => a.title === act.title);
       if (!dup) {
-        await client.db.from('activities').insert({ ...act, created_at: new Date().toISOString().slice(0,19).replace('T', ' ') });
+        await client.db.from('activities').insert().set({ ...act, created_at: new Date().toISOString().slice(0,19).replace('T', ' ') });
         count++;
       }
     } catch(e) { console.warn('seed activity err:', e); }
@@ -1498,7 +1543,7 @@ async function addDefaultImages() {
       const existing = await client.db.from('activity_images').list();
       const dup = Array.isArray(existing.data) && existing.data.some(i => i.image_url === img.image_url);
       if (!dup) {
-        await client.db.from('activity_images').insert({ ...img, created_at: new Date().toISOString().slice(0,19).replace('T', ' ') });
+        await client.db.from('activity_images').insert().set({ ...img, created_at: new Date().toISOString().slice(0,19).replace('T', ' ') });
       }
     } catch(e) { /* skip dupes */ }
   }
@@ -1571,6 +1616,20 @@ function openActivityModal(data) {
   openModal('activity-modal');
 }
 
+// Helper: reliably delete by id (SDK builder chain)
+async function deleteByEq(table, column, value) {
+  const builder = client.db.from(table).delete();
+  // eq adds { [column]: { eq: value } } to filters
+  builder._addFilter(column, 'eq', value);
+  return await builder._execute();
+}
+
+// Helper: insert with data (SDK requires .set() chain)
+async function insertInto(table, data) {
+  data.created_at = new Date().toISOString().slice(0,19).replace('T', ' ');
+  return await client.db.from(table).insert().set(data);
+}
+
 async function saveActivity(e) {
   e.preventDefault();
   const id = document.getElementById('act-id').value;
@@ -1592,16 +1651,11 @@ async function saveActivity(e) {
   try {
     let res;
     if (id) {
-      // Update: try patch first, fallback to delete+insert
-      try {
-        res = await client.request('PATCH', '/db/activities/' + id, data);
-      } catch(e) {
-        // Fallback: delete + insert
-        await client.db.from('activities').delete(id);
-        res = await client.db.from('activities').insert(data);
-      }
+      data.created_at = new Date().toISOString().slice(0,19).replace('T', ' ');
+      // SDK update: builder chain with eq
+      res = await client.db.from('activities').update().set(data)._addFilter('id', 'eq', id)._execute();
     } else {
-      res = await client.db.from('activities').insert(data);
+      res = await insertInto('activities', data);
     }
     toast(id ? '活动已更新 ✅' : '活动已创建 ✅');
     closeModal('activity-modal');
@@ -1621,7 +1675,7 @@ function editActivity(id) {
 async function deleteActivity(id) {
   if (!confirm('确定要删除这个活动吗？')) return;
   try {
-    await client.db.from('activities').delete(id);
+    await deleteByEq('activities', 'id', id);
     toast('活动已删除');
     loadActivities();
   } catch(err) {
@@ -1731,14 +1785,9 @@ async function saveImage(e) {
   try {
     let res;
     if (id) {
-      try {
-        res = await client.request('PATCH', '/db/activity_images/' + id, data);
-      } catch(e) {
-        await client.db.from('activity_images').delete(id);
-        res = await client.db.from('activity_images').insert(data);
-      }
+      res = await client.db.from('activity_images').update().set(data)._addFilter('id', 'eq', id)._execute();
     } else {
-      res = await client.db.from('activity_images').insert(data);
+      res = await insertInto('activity_images', data);
     }
     toast(id ? '影像已更新 ✅' : '影像已添加 ✅');
     closeModal('image-modal');
@@ -1758,7 +1807,7 @@ function editImage(id) {
 async function deleteImage(id) {
   if (!confirm('确定要删除这张影像吗？')) return;
   try {
-    await client.db.from('activity_images').delete(id);
+    await deleteByEq('activity_images', 'id', id);
     toast('影像已删除');
     loadImages();
   } catch(err) {
