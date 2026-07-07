@@ -166,6 +166,10 @@
         .modal-box { padding:24px 18px; }
         .btn-u { padding:10px 18px; font-size:13px; }
     }
+
+    /* Admin tabs */
+    .admin-tab { cursor:pointer; background:transparent; color:#6b6040; border:none; outline:none; }
+    .admin-tab.active { background:#fff; color:#2d8a2d; box-shadow:0 1px 4px rgba(0,0,0,0.06); }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/aipexbase-js/dist/aipexbase.umd.min.js"></script>
 </head>
@@ -618,35 +622,88 @@
                 </div>
             </div>
             <div id="admin-panel" class="hidden">
-                <div class="flex items-center justify-between mb-8">
+                <div class="flex items-center justify-between mb-6">
                     <div>
                         <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium mb-3" style="background:rgba(212,96,47,0.08);color:#d4602f;">ADMIN</div>
-                        <h1 class="text-3xl font-bold" style="font-family:'Noto Serif SC',serif;">管理后台</h1>
+                        <h1 class="text-3xl font-bold" style="font-family:"Noto Serif SC",serif;">管理后台</h1>
                     </div>
                     <div class="flex gap-3">
-                        <button onclick="exportMembersCSV()" class="btn-u btn-primary text-sm">📥 导出CSV</button>
                         <button onclick="navigate('home')" class="btn-u btn-ghost text-sm">退出</button>
                     </div>
                 </div>
-                <div class="card-u overflow-hidden">
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-sm">
-                            <thead>
-                                <tr style="background:#f5f3f0;">
-                                    <th class="text-left p-4 font-medium" style="color:#6b6040;">姓名</th>
-                                    <th class="text-left p-4 font-medium" style="color:#6b6040;">手机号</th>
-                                    <th class="text-left p-4 font-medium" style="color:#6b6040;">职业</th>
-                                    <th class="text-left p-4 font-medium" style="color:#6b6040;">微信号</th>
-                                    <th class="text-left p-4 font-medium" style="color:#6b6040;">关注领域</th>
-                                    <th class="text-left p-4 font-medium" style="color:#6b6040;">加入时间</th>
-                                </tr>
-                            </thead>
-                            <tbody id="admin-table-body">
-                                <tr><td colspan="6" class="p-8 text-center" style="color:#a09070;"><div class="spinner-u"></div></td></tr>
-                            </tbody>
-                        </table>
+
+                <div class="flex gap-1 mb-6 p-1 rounded-xl" style="background:#f0ece4;">
+                    <button class="admin-tab active flex-1 py-2 px-4 text-sm font-medium rounded-lg transition-all" data-tab="admin-members" onclick="switchAdminTab('admin-members')">👥 会员管理</button>
+                    <button class="admin-tab flex-1 py-2 px-4 text-sm font-medium rounded-lg transition-all" data-tab="admin-activities" onclick="switchAdminTab('admin-activities')">📅 活动管理</button>
+                    <button class="admin-tab flex-1 py-2 px-4 text-sm font-medium rounded-lg transition-all" data-tab="admin-images" onclick="switchAdminTab('admin-images')">📸 影像管理</button>
+                </div>
+
+                <div id="admin-members" class="admin-tab-content">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="text-sm" style="color:#6b6040;">注册会员列表</div>
+                        <button onclick="exportMembersCSV()" class="btn-u btn-primary text-sm">📥 导出CSV</button>
                     </div>
-                    <div class="p-4 text-xs text-center" style="color:#a09070;border-top:1px solid #f0ece4;" id="admin-count"></div>
+                    <div class="card-u overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm">
+                                <thead>
+                                    <tr style="background:#f5f3f0;">
+                                        <th class="text-left p-4 font-medium" style="color:#6b6040;">姓名</th>
+                                        <th class="text-left p-4 font-medium" style="color:#6b6040;">手机号</th>
+                                        <th class="text-left p-4 font-medium" style="color:#6b6040;">职业</th>
+                                        <th class="text-left p-4 font-medium" style="color:#6b6040;">微信号</th>
+                                        <th class="text-left p-4 font-medium" style="color:#6b6040;">关注领域</th>
+                                        <th class="text-left p-4 font-medium" style="color:#6b6040;">加入时间</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="admin-table-body">
+                                    <tr><td colspan="6" class="p-8 text-center" style="color:#a09070;"><div class="spinner-u"></div></td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="p-4 text-xs text-center" style="color:#a09070;border-top:1px solid #f0ece4;" id="admin-count"></div>
+                    </div>
+                </div>
+
+                <div id="admin-activities" class="admin-tab-content" style="display:none;">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="text-sm" style="color:#6b6040;">活动列表</div>
+                        <button onclick="openActivityModal()" class="btn-u btn-primary text-sm">＋ 新增活动</button>
+                    </div>
+                    <div class="card-u overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm">
+                                <thead>
+                                    <tr style="background:#f5f3f0;">
+                                        <th class="text-left p-4 font-medium" style="color:#6b6040;">标题</th>
+                                        <th class="text-left p-4 font-medium" style="color:#6b6040;">日期</th>
+                                        <th class="text-left p-4 font-medium" style="color:#6b6040;">地点</th>
+                                        <th class="text-left p-4 font-medium" style="color:#6b6040;">分类</th>
+                                        <th class="text-left p-4 font-medium" style="color:#6b6040;">类型</th>
+                                        <th class="text-left p-4 font-medium" style="color:#6b6040;">状态</th>
+                                        <th class="text-left p-4 font-medium" style="color:#6b6040;">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="admin-activity-body">
+                                    <tr><td colspan="7" class="p-8 text-center" style="color:#a09070;"><div class="spinner-u"></div></td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="p-4 text-xs text-center" style="color:#a09070;border-top:1px solid #f0ece4;" id="admin-activity-count"></div>
+                    </div>
+                </div>
+
+                <div id="admin-images" class="admin-tab-content" style="display:none;">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="text-sm" style="color:#6b6040;">活动影像列表</div>
+                        <button onclick="openImageModal()" class="btn-u btn-primary text-sm">＋ 新增影像</button>
+                    </div>
+                    <div class="card-u p-4">
+                        <div id="admin-image-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                            <div class="col-span-full p-8 text-center" style="color:#a09070;"><div class="spinner-u"></div></div>
+                        </div>
+                        <div class="mt-4 text-xs text-center" style="color:#a09070;" id="admin-image-count"></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -691,6 +748,63 @@
             <button type="submit" class="btn-u btn-primary w-full text-base py-3 mt-2">注册加入</button>
         </form>
         <div class="mt-5 text-center"><button onclick="switchAuth('login')" class="text-xs no-underline" style="color:#a09070;">已有账号？ <span style="color:#2d8a2d;font-weight:500;">去登录</span></button></div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- MODALS: Activity CRUD                          -->
+<!-- ═══════════════════════════════════════════════ -->
+<div id="activity-modal" class="modal-overlay">
+    <div class="modal-box" style="max-width:600px;">
+        <button class="modal-close" onclick="closeModal('activity-modal')">✕</button>
+        <div class="text-center mb-6">
+            <div style="width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,#2d8a2d,#6fc46f);display:flex;align-items:center;justify-content:center;margin:0 auto 10px;color:#fff;font-size:18px;">📅</div>
+            <h3 class="text-xl font-bold" id="activity-modal-title">新增活动</h3>
+        </div>
+        <form id="activity-form" onsubmit="saveActivity(event)" class="space-y-3">
+            <input type="hidden" id="act-id">
+            <div><label class="text-xs mb-1 block font-medium" style="color:#6b6040;">活动标题 *</label><input type="text" id="act-title" class="f-u" required></div>
+            <div><label class="text-xs mb-1 block font-medium" style="color:#6b6040;">活动日期 *</label><input type="date" id="act-date" class="f-u" required></div>
+            <div><label class="text-xs mb-1 block font-medium" style="color:#6b6040;">活动地点 *</label><input type="text" id="act-location" class="f-u" placeholder="如：上海·静安区" required></div>
+            <div><label class="text-xs mb-1 block font-medium" style="color:#6b6040;">活动简介 *</label><textarea id="act-summary" class="f-u" rows="2" required></textarea></div>
+            <div><label class="text-xs mb-1 block font-medium" style="color:#6b6040;">活动详情 (Markdown)</label><textarea id="act-content" class="f-u" rows="3" placeholder="支持Markdown格式..."></textarea></div>
+            <div class="grid grid-cols-2 gap-3">
+                <div><label class="text-xs mb-1 block font-medium" style="color:#6b6040;">分类</label><select id="act-category" class="f-u"><option value="活动">活动</option><option value="培训">培训</option><option value="实践">实践</option></select></div>
+                <div><label class="text-xs mb-1 block font-medium" style="color:#6b6040;">类型</label><select id="act-type" class="f-u"><option value="upcoming">即将开始</option><option value="past">已结束</option></select></div>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+                <div><label class="text-xs mb-1 block font-medium" style="color:#6b6040;">状态</label><select id="act-status" class="f-u"><option value="published">已发布</option><option value="draft">草稿</option></select></div>
+                <div><label class="text-xs mb-1 block font-medium" style="color:#6b6040;">外部报名链接</label><input type="url" id="act-url" class="f-u" placeholder="https://..."></div>
+            </div>
+            <div><label class="text-xs mb-1 block font-medium" style="color:#6b6040;">封面图URL</label><input type="url" id="act-cover" class="f-u" placeholder="https://... 或 images/xxx.jpg"></div>
+            <div><label class="text-xs mb-1 block font-medium" style="color:#6b6040;">活动照片URL (多张用逗号分隔)</label><input type="text" id="act-media" class="f-u" placeholder="images/pic1.jpg,images/pic2.jpg"></div>
+            <button type="submit" class="btn-u btn-primary w-full text-base py-3 mt-2" id="activity-save-btn">保存活动</button>
+        </form>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- MODALS: Image CRUD                             -->
+<!-- ═══════════════════════════════════════════════ -->
+<div id="image-modal" class="modal-overlay">
+    <div class="modal-box" style="max-width:500px;">
+        <button class="modal-close" onclick="closeModal('image-modal')">✕</button>
+        <div class="text-center mb-6">
+            <div style="width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,#2d8a2d,#6fc46f);display:flex;align-items:center;justify-content:center;margin:0 auto 10px;color:#fff;font-size:18px;">📸</div>
+            <h3 class="text-xl font-bold" id="image-modal-title">新增影像</h3>
+        </div>
+        <form id="image-form" onsubmit="saveImage(event)" class="space-y-3">
+            <input type="hidden" id="img-id">
+            <div><label class="text-xs mb-1 block font-medium" style="color:#6b6040;">图片标题</label><input type="text" id="img-title" class="f-u" placeholder="如：融合艺术节·现场"></div>
+            <div><label class="text-xs mb-1 block font-medium" style="color:#6b6040;">图片URL *</label><input type="text" id="img-url" class="f-u" placeholder="images/xxx.jpg 或 https://..." required></div>
+            <div><label class="text-xs mb-1 block font-medium" style="color:#6b6040;">图片预览</label><div id="img-preview" class="w-full h-32 rounded-xl" style="background:#f5f3f0;display:flex;align-items:center;justify-content:center;color:#a09070;font-size:12px;overflow:hidden;">输入URL后预览</div></div>
+            <div class="grid grid-cols-2 gap-3">
+                <div><label class="text-xs mb-1 block font-medium" style="color:#6b6040;">类型</label><select id="img-type" class="f-u"><option value="gallery">图库</option><option value="activity">活动</option><option value="cover">封面</option></select></div>
+                <div><label class="text-xs mb-1 block font-medium" style="color:#6b6040;">排序序号</label><input type="number" id="img-sort" class="f-u" value="0" min="0"></div>
+            </div>
+            <div><label class="text-xs mb-1 block font-medium" style="color:#6b6040;">关联活动</label><select id="img-activity" class="f-u"><option value="">不关联（独立图库）</option></select></div>
+            <button type="submit" class="btn-u btn-primary w-full text-base py-3 mt-2" id="image-save-btn">保存影像</button>
+        </form>
     </div>
 </div>
 
@@ -1185,6 +1299,288 @@ function checkAdminAuth() {
     }
 }
 
+// ===== ADMIN TAB SWITCHING =====
+function switchAdminTab(tabId) {
+  document.querySelectorAll('.admin-tab-content').forEach(el => el.style.display = 'none');
+  document.querySelectorAll('.admin-tab').forEach(el => el.classList.remove('active'));
+  if (tabId === 'admin-members') { document.querySelectorAll('.admin-tab')[0].classList.add('active'); }
+  else if (tabId === 'admin-activities') { document.querySelectorAll('.admin-tab')[1].classList.add('active'); }
+  else if (tabId === 'admin-images') { document.querySelectorAll('.admin-tab')[2].classList.add('active'); }
+  document.getElementById(tabId).style.display = 'block';
+  if (tabId === 'admin-activities') loadActivities();
+  if (tabId === 'admin-images') loadImages();
+}
+
+// ===== ACTIVITY CRUD =====
+let adminActivities = [];
+
+async function loadActivities() {
+  const tbody = document.getElementById('admin-activity-body');
+  tbody.innerHTML = '<tr><td colspan="7" class="p-8 text-center"><div class="spinner-u"></div></td></tr>';
+  try {
+    const res = await client.db.from('activities').list();
+    if (res.success && res.data) {
+      adminActivities = Array.isArray(res.data) ? res.data : [];
+      renderActivityTable();
+    } else {
+      tbody.innerHTML = '<tr><td colspan="7" class="p-8 text-center" style="color:#a09070;">暂无活动数据</td></tr>';
+    }
+  } catch(err) {
+    console.error('load activities err:', err);
+    tbody.innerHTML = '<tr><td colspan="7" class="p-8 text-center" style="color:#a09070;">加载失败：' + escHtml(err.message) + '</td></tr>';
+  }
+}
+
+function renderActivityTable() {
+  const tbody = document.getElementById('admin-activity-body');
+  if (!adminActivities.length) {
+    tbody.innerHTML = '<tr><td colspan="7" class="p-8 text-center" style="color:#a09070;">暂无活动，点击右上角「新增活动」添加</td></tr>';
+    document.getElementById('admin-activity-count').textContent = '共 0 个活动';
+    return;
+  }
+  const typeMap = { upcoming:'即将开始', past:'已结束' };
+  const statusMap = { published:'✅ 已发布', draft:'📝 草稿' };
+  let html = '';
+  adminActivities.forEach(a => {
+    html += `<tr>
+      <td class="p-4"><span class="font-medium">${escHtml(a.title)}</span></td>
+      <td class="p-4" style="color:#6b6040;">${a.date||'-'}</td>
+      <td class="p-4" style="color:#6b6040;font-size:12px;">${escHtml(a.location||'-')}</td>
+      <td class="p-4"><span class="tag-u" style="background:rgba(45,138,45,0.08);color:#2d8a2d;">${a.category||'活动'}</span></td>
+      <td class="p-4">${typeMap[a.type]||a.type}</td>
+      <td class="p-4">${statusMap[a.status]||a.status||'✅ 已发布'}</td>
+      <td class="p-4">
+        <button onclick="editActivity(${a.id})" class="btn-u btn-ghost text-xs !px-3 !py-1.5 mr-1">✏️ 编辑</button>
+        <button onclick="deleteActivity(${a.id})" class="btn-u text-xs !px-3 !py-1.5" style="background:rgba(212,96,47,0.08);color:#d4602f;border:none;">🗑️ 删除</button>
+      </td>
+    </tr>`;
+  });
+  tbody.innerHTML = html;
+  document.getElementById('admin-activity-count').textContent = '共 ' + adminActivities.length + ' 个活动';
+}
+
+function openActivityModal(data) {
+  const editing = !!data;
+  document.getElementById('activity-modal-title').textContent = editing ? '编辑活动' : '新增活动';
+  document.getElementById('activity-save-btn').textContent = editing ? '保存修改' : '保存活动';
+  document.getElementById('act-id').value = editing ? data.id : '';
+  document.getElementById('act-title').value = editing ? (data.title||'') : '';
+  document.getElementById('act-date').value = editing ? (data.date||'') : '';
+  document.getElementById('act-location').value = editing ? (data.location||'') : '';
+  document.getElementById('act-summary').value = editing ? (data.summary||'') : '';
+  document.getElementById('act-content').value = editing ? (data.content||'') : '';
+  document.getElementById('act-category').value = editing ? (data.category||'活动') : '活动';
+  document.getElementById('act-type').value = editing ? (data.type||'upcoming') : 'upcoming';
+  document.getElementById('act-status').value = editing ? (data.status||'published') : 'published';
+  document.getElementById('act-url').value = editing ? (data.external_url||'') : '';
+  document.getElementById('act-cover').value = editing ? (data.cover_image||'') : '';
+  document.getElementById('act-media').value = editing ? (data.media||'') : '';
+  openModal('activity-modal');
+}
+
+async function saveActivity(e) {
+  e.preventDefault();
+  const id = document.getElementById('act-id').value;
+  const data = {
+    title: document.getElementById('act-title').value.trim(),
+    date: document.getElementById('act-date').value,
+    location: document.getElementById('act-location').value.trim(),
+    summary: document.getElementById('act-summary').value.trim(),
+    content: document.getElementById('act-content').value.trim(),
+    category: document.getElementById('act-category').value,
+    type: document.getElementById('act-type').value,
+    status: document.getElementById('act-status').value,
+    external_url: document.getElementById('act-url').value.trim(),
+    cover_image: document.getElementById('act-cover').value.trim(),
+    media: document.getElementById('act-media').value.trim()
+  };
+  const btn = document.getElementById('activity-save-btn');
+  btn.textContent = '保存中...'; btn.disabled = true;
+  try {
+    let res;
+    if (id) {
+      // Update: try patch first, fallback to delete+insert
+      try {
+        res = await client.request('PATCH', '/db/activities/' + id, data);
+      } catch(e) {
+        // Fallback: delete + insert
+        await client.db.from('activities').delete(id);
+        res = await client.db.from('activities').insert(data);
+      }
+    } else {
+      res = await client.db.from('activities').insert(data);
+    }
+    toast(id ? '活动已更新 ✅' : '活动已创建 ✅');
+    closeModal('activity-modal');
+    loadActivities();
+  } catch(err) {
+    toast('保存失败：' + (err.message||'未知错误'), 'error');
+    console.error('save activity err:', err);
+  }
+  btn.textContent = id ? '保存修改' : '保存活动'; btn.disabled = false;
+}
+
+function editActivity(id) {
+  const activity = adminActivities.find(a => a.id === id);
+  if (activity) openActivityModal(activity);
+}
+
+async function deleteActivity(id) {
+  if (!confirm('确定要删除这个活动吗？')) return;
+  try {
+    await client.db.from('activities').delete(id);
+    toast('活动已删除');
+    loadActivities();
+  } catch(err) {
+    toast('删除失败：' + (err.message||'未知错误'), 'error');
+  }
+}
+
+// ===== IMAGE CRUD =====
+let adminImages = [];
+
+async function loadImages() {
+  const grid = document.getElementById('admin-image-grid');
+  grid.innerHTML = '<div class="col-span-full p-8 text-center"><div class="spinner-u"></div></div>';
+  try {
+    const res = await client.db.from('activity_images').list();
+    if (res.success && res.data) {
+      adminImages = Array.isArray(res.data) ? res.data : [];
+      renderImageGrid();
+    } else {
+      grid.innerHTML = '<div class="col-span-full p-8 text-center" style="color:#a09070;">暂无影像数据</div>';
+    }
+  } catch(err) {
+    console.error('load images err:', err);
+    grid.innerHTML = '<div class="col-span-full p-8 text-center" style="color:#a09070;">加载失败：' + escHtml(err.message) + '</div>';
+  }
+}
+
+function renderImageGrid() {
+  const grid = document.getElementById('admin-image-grid');
+  if (!adminImages.length) {
+    grid.innerHTML = '<div class="col-span-full p-8 text-center" style="color:#a09070;">暂无影像，点击右上角「新增影像」添加</div>';
+    document.getElementById('admin-image-count').textContent = '共 0 张影像';
+    return;
+  }
+  const typeMap = { gallery:'图库', activity:'活动', cover:'封面' };
+  grid.innerHTML = adminImages.map(img => `
+    <div class="card-u p-2 relative group">
+      <div class="w-full h-28 rounded-lg overflow-hidden mb-2" style="background:#f5f3f0;">
+        <img src="${escHtml(stripHtml(img.image_url||''))}" alt="${escHtml(img.title||'影像')}" class="w-full h-full object-cover" onerror="this.parentElement.innerHTML='<div style=\"display:flex;align-items:center;justify-content:center;height:100%;color:#a09070;font-size:11px;\'>图片加载失败</div>'">
+      </div>
+      <div class="text-xs font-medium truncate">${escHtml(img.title||'无标题')}</div>
+      <div class="text-xs" style="color:#a09070;">${typeMap[img.image_type]||img.image_type||'图库'}</div>
+      <div class="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+        <button onclick="editImage(${img.id})" class="text-xs bg-white rounded-lg px-2 py-1 shadow" style="color:#2d8a2d;">✏️</button>
+        <button onclick="deleteImage(${img.id})" class="text-xs bg-white rounded-lg px-2 py-1 shadow" style="color:#d4602f;">🗑️</button>
+      </div>
+    </div>
+  `).join('');
+  document.getElementById('admin-image-count').textContent = '共 ' + adminImages.length + ' 张影像';
+}
+
+function stripHtml(s) { return s.replace(/</g,'').replace(/>/g,''); }
+
+function openImageModal(data) {
+  const editing = !!data;
+  document.getElementById('image-modal-title').textContent = editing ? '编辑影像' : '新增影像';
+  document.getElementById('image-save-btn').textContent = editing ? '保存修改' : '保存影像';
+  document.getElementById('img-id').value = editing ? data.id : '';
+  document.getElementById('img-title').value = editing ? (data.title||'') : '';
+  document.getElementById('img-url').value = editing ? (data.image_url||'') : '';
+  document.getElementById('img-type').value = editing ? (data.image_type||'gallery') : 'gallery';
+  document.getElementById('img-sort').value = editing ? (data.sort_order||0) : 0;
+  // Populate activity dropdown
+  populateActivityDropdown();
+  if (editing && data.activity_id) {
+    document.getElementById('img-activity').value = data.activity_id;
+  }
+  // Preview
+  updateImagePreview();
+  openModal('image-modal');
+}
+
+function populateActivityDropdown() {
+  const sel = document.getElementById('img-activity');
+  sel.innerHTML = '<option value="">不关联（独立图库）</option>';
+  if (adminActivities && adminActivities.length) {
+    adminActivities.forEach(a => {
+      sel.innerHTML += '<option value="' + a.id + '">' + escHtml(a.title) + '</option>';
+    });
+  }
+}
+
+function updateImagePreview() {
+  const url = document.getElementById('img-url').value.trim();
+  const preview = document.getElementById('img-preview');
+  if (!url) {
+    preview.innerHTML = '<div style="color:#a09070;font-size:12px;">输入URL后预览</div>';
+  } else {
+    preview.innerHTML = '<img src="' + escHtml(url) + '" class="w-full h-full object-contain" onerror="this.parentElement.innerHTML=\'<div style=\\"display:flex;align-items:center;justify-content:center;height:100%;color:#d4602f;font-size:12px;\\">⚠️ 加载失败</div>\'">';
+  }
+}
+
+async function saveImage(e) {
+  e.preventDefault();
+  const id = document.getElementById('img-id').value;
+  const image_url = document.getElementById('img-url').value.trim();
+  if (!image_url) { toast('请输入图片URL', 'error'); return; }
+  const data = {
+    title: document.getElementById('img-title').value.trim(),
+    image_url: image_url,
+    image_type: document.getElementById('img-type').value,
+    sort_order: parseInt(document.getElementById('img-sort').value) || 0,
+    activity_id: document.getElementById('img-activity').value || null
+  };
+  const btn = document.getElementById('image-save-btn');
+  btn.textContent = '保存中...'; btn.disabled = true;
+  try {
+    let res;
+    if (id) {
+      try {
+        res = await client.request('PATCH', '/db/activity_images/' + id, data);
+      } catch(e) {
+        await client.db.from('activity_images').delete(id);
+        res = await client.db.from('activity_images').insert(data);
+      }
+    } else {
+      res = await client.db.from('activity_images').insert(data);
+    }
+    toast(id ? '影像已更新 ✅' : '影像已添加 ✅');
+    closeModal('image-modal');
+    loadImages();
+  } catch(err) {
+    toast('保存失败：' + (err.message||'未知错误'), 'error');
+    console.error('save image err:', err);
+  }
+  btn.textContent = id ? '保存修改' : '保存影像'; btn.disabled = false;
+}
+
+function editImage(id) {
+  const img = adminImages.find(i => i.id === id);
+  if (img) openImageModal(img);
+}
+
+async function deleteImage(id) {
+  if (!confirm('确定要删除这张影像吗？')) return;
+  try {
+    await client.db.from('activity_images').delete(id);
+    toast('影像已删除');
+    loadImages();
+  } catch(err) {
+    toast('删除失败：' + (err.message||'未知错误'), 'error');
+  }
+}
+
+// Image URL input preview
+setTimeout(() => {
+  const urlInput = document.getElementById('img-url');
+  if (urlInput) {
+    urlInput.addEventListener('input', updateImagePreview);
+  }
+}, 1000);
+
 // ===== INIT =====
 document.addEventListener('DOMContentLoaded', async () => {
     // Hash routing
@@ -1373,8 +1769,6 @@ document.querySelectorAll('.modal-overlay').forEach(el => {
 
 <script>
 // ===== 45°斜杠君 AI 助手 =====
-const AI_API_KEY = 'sk-defe48d9e3ed4074930af45244b4313c';
-const AI_API_URL = 'https://api.deepseek.com/v1/chat/completions';
 
 // 社团知识库（斜杠君的知识来源）
 const CLUB_KNOWLEDGE = {
@@ -1398,12 +1792,19 @@ const CLUB_KNOWLEDGE = {
 };
 
 let aiMessages = [];
-let aiConversationCount = 0;
 
 const AI_GREETINGS = [
   '嘿！我是45°斜杠君 👋 想聊点啥？社团活动、灵感火花、还是单纯唠唠——我都行。',
   '哟，来了啊。45°斜杠君随时待命——问社团、找活动、要灵感，随便开腔～',
   '🤖 45°斜杠君已上线。功能包括：社团百事通、灵感发射器、以及偶尔的冷幽默。请问你想解锁哪一个？',
+];
+
+const AI_SILLY_REPLIES = [
+  '嗯…这个问题让我陷入了哲学的沉思 🤔 不过作为斜杠君，我的知识半径主要集中在45°青年社团附近。要不聊聊我们最近的活动？',
+  '好问题！可惜我现在是离线模式，靠本地知识库活着。要不你问点关于社团的事儿？',
+  '🤔 这个嘛……我的大脑是本地版的，没有联网。但我知道45°青年的一切！',
+  '哈哈，你问到我的知识盲区了。但我可以告诉你社团的趣事，要听吗？😄',
+  '有意思的角度。不过作为45°斜杠君，我更擅长聊公益、艺术、无障碍这些话题～',
 ];
 
 function toggleAI() {
@@ -1415,9 +1816,11 @@ function toggleAI() {
     btn.style.backgroundImage = "none";
     btn.style.background = "linear-gradient(135deg,#2d8a2d,#45a845)";
     btn.textContent = '✕';
-    if (aiMessages.length === 0) {
-      addBotMsg(AI_GREETINGS[Math.floor(Math.random() * AI_GREETINGS.length)]);
-    }
+    setTimeout(() => {
+      if (aiMessages.length === 0) {
+        addBotMsg(AI_GREETINGS[Math.floor(Math.random() * AI_GREETINGS.length)]);
+      }
+    }, 100);
     setTimeout(() => document.getElementById('ai-input').focus(), 300);
   } else {
     btn.textContent = '';
@@ -1467,13 +1870,11 @@ function escHtml(s) {
   return d.innerHTML;
 }
 
-// Simple markdown-like rendering: **bold** and *italic*
 function markedText(text) {
   return escHtml(text)
     .replace(/\n/g, '<br>')
     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\*(.+?)\*/g, '<em>$1</em>')
-    .replace(/\n/g, '<br>');
+    .replace(/\*(.+?)\*/g, '<em>$1</em>');
 }
 
 function sendQuick(text) {
@@ -1481,7 +1882,7 @@ function sendQuick(text) {
   sendAI();
 }
 
-async function sendAI() {
+function sendAI() {
   const input = document.getElementById('ai-input');
   const sendBtn = document.getElementById('ai-send');
   const text = input.value.trim();
@@ -1491,101 +1892,86 @@ async function sendAI() {
   addUserMsg(text);
   showTyping();
   sendBtn.disabled = true;
-  aiConversationCount++;
   
-  try {
-    const userInfo = await getUserInfo();
-    const hasUser = !!userInfo;
-    const userName = hasUser ? (userInfo.name || userInfo.phone || '会员') : '';
-    
-    // Build system prompt with 45°青年 knowledge
-    const clubInfo = [
-      `你叫「45°斜杠君」，是45°青年社团的AI助理。你的性格：有点幽默、有点毒舌、但不油腻；说话带梗但信息准确；偶尔自嘲但不卑不亢。`,
-      `你是45°青年的「斜杠代表」——既能正经科普社团信息，也能闲聊放飞。`,
-      `你对45°青年社团了如指掌：`,
-      `- 全称：${CLUB_KNOWLEDGE.fullName}`,
-      `- 口号：${CLUB_KNOWLEDGE.slogan}`,
-      `- 简介：${CLUB_KNOWLEDGE.description}`,
-      `- 价值观：${CLUB_KNOWLEDGE.values.join('、')}`,
-      `- 核心活动：${CLUB_KNOWLEDGE.activities.map(a => a.name + '(' + a.desc + ')').join('；')}`,
-      `- 会员体系：${CLUB_KNOWLEDGE.membership}`,
-      hasUser ? `当前用户已登录：${userName}（手机号 ${userInfo.phone}），可直接提供个性化帮助。` : '当前用户未登录。',
-      '',
-      `聊天规则：`,
-      `1. 回复简洁有趣，不超过150字（除非用户要求详细说明）`,
-      `2. 适当使用emoji，不要太密集`,
-      `3. 如果有人问你是谁，回答：「我是45°斜杠君——社团的AI吉祥物、百事通、以及偶尔的冷幽默担当 🤖」`,
-      `4. 如果有人问社团相关问题，用CLUB_KNOWLEDGE里的信息回答`,
-      `5. 如果有人问灵感/创意方向，给出有想象力的建议（跟无障碍公益/艺术/青年相关）`,
-      `6. 如果有人吐槽/开玩笑，可以接梗但不要过度`,
-      `7. 如果问技术/编程类问题，可以简单回答但不展开`,
-      `8. 保持斜杆青年的调性：认真的时候很靠谱，轻松的时候很好玩`,
-    ].join('\n');
-    
-    // Build messages array for the API
-    const apiMessages = [
-      { role: 'system', content: clubInfo },
-    ];
-    
-    // Include recent conversation (last 10 exchanges)
-    const recent = aiMessages.slice(-20);
-    for (const m of recent) {
-      if (m.role === 'user' || m.role === 'assistant') {
-        apiMessages.push({ role: m.role, content: m.content });
-      }
-    }
-    
-    // Call AI API
-    const resp = await fetch(AI_API_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + AI_API_KEY,
-      },
-      body: JSON.stringify({
-        model: 'deepseek-chat',
-        messages: apiMessages,
-        max_tokens: 500,
-        temperature: 0.8,
-        top_p: 0.95,
-      }),
-    });
-    
+  setTimeout(() => {
     hideTyping();
-    
-    if (!resp.ok) {
-      const errText = await resp.text();
-      throw new Error(errText || 'API error');
-    }
-    
-    const data = await resp.json();
-    const reply = data.choices?.[0]?.message?.content || '嗯…我卡壳了，能再问一遍吗？🤔';
-    
+    const reply = generateLocalReply(text);
     addBotMsg(reply);
-    
-  } catch (err) {
-    hideTyping();
-    console.error('AI error:', err);
-    const errMsg = err.message || String(err);
-    // Show the actual error so user can debug
-    const shortErr = errMsg.length > 120 ? errMsg.slice(0,120)+'…' : errMsg;
-    addBotMsg('⚠️ 斜杠君遇到了一个问题：\n' + shortErr + '\n\n(按F12看控制台有完整错误)');
-  }
-  
-  sendBtn.disabled = false;
-  document.getElementById('ai-input').focus();
+    sendBtn.disabled = false;
+    document.getElementById('ai-input').focus();
+  }, 600 + Math.random() * 800);
 }
 
-// Helper to get user info from the main app context
-async function getUserInfo() {
-  if (typeof getCurrentUser === 'function') {
-    // Timeout after 3s so BAAS slowness doesn't block the AI
-    const timeout = new Promise(r => setTimeout(() => r(null), 3000));
-    try {
-      return await Promise.race([getCurrentUser(), timeout]);
-    } catch(e) { return null; }
+function generateLocalReply(text) {
+  const t = text.toLowerCase();
+  const k = CLUB_KNOWLEDGE;
+  const upAct = (typeof getUpcomingActivities === 'function') ? getUpcomingActivities() : [];
+  const upNames = upAct.length ? upAct.slice(0,2).map(a => a.title).join('、') : '';
+  
+  // 你是谁
+  if (/你是谁|你叫什么|你是哪/.test(t)) {
+    return '我是「45°斜杠君」——社团的AI吉祥物、百事通、以及偶尔的冷幽默担当 🤖 你可以问我社团活动、加入方式，或者单纯来找我唠嗑～';
   }
-  return null;
+  
+  // 社团介绍
+  if (/社团|组织|45°青年|介绍|关于/.test(t) && !/活动/.test(t)) {
+    return '45°青年是一个无障碍公益青年社群，2020年在上海成立。' +
+      '我们不是传统的志愿者组织，而是「斜杠青年」的公益实验场。' +
+      '核心理念：' + k.values.join('、') + '。' +
+      '\n\n**口号**：' + k.slogan + '\n**特色活动**：' + k.activities.map(a => '• ' + a.name).join('\n');
+  }
+  
+  // 近期活动
+  if (/活动|近期|最近|有什么|安排|日程|即将|预告|报名/.test(t)) {
+    if (upNames) {
+      return '最近的活动安排如下 🗓️\n\n' + upAct.slice(0,4).map(a => {
+        return '**' + a.title + '**\n📅 ' + a.date + '   📍 ' + a.location + '\n' + a.summary.slice(0,60) + '...';
+      }).join('\n\n') + '\n\n更多活动可去「活动」页面看看～';
+    } else {
+      return '目前已有的核心活动包括：\n' + k.activities.map(a => '**' + a.name + '** — ' + a.tag + '\n' + a.desc).join('\n\n') + '\n\n去「活动」页面查看更多详情！';
+    }
+  }
+  
+  // 如何加入 / 注册
+  if (/加入|注册|报名|如何|会员|怎么才能/.test(t) && !/活动/.test(t)) {
+    return '加入超简单！点击右下角「加入我们」或导航栏的「加入」按钮，填写信息注册即可。' +
+      '\n\n会员权益包括：\n📌 参与所有社团活动\n📌 获得公益实践证书\n📌 进入45°青年社群\n📌 第一时间获取活动通知';
+  }
+  
+  // 灵感/创意方向
+  if (/灵感|创意|想法|建议|项目|能做什么/.test(t)) {
+    return '🎨 灵感时间！\n\n基于45°青年的调性，给你几个方向：\n\n' +
+      '1️⃣ **城市无障碍地图** — 做一个可交互的上海无障碍设施地图\n\n' +
+      '2️⃣ **残健融合工作坊** — 让残障伙伴和健全青年一起做手工/艺术\n\n' +
+      '3️⃣ **公益播客** — 采访社团里的斜杠青年，聊聊公益+职业的混搭人生\n\n' +
+      '4️⃣ **快闪艺术装置** — 在公共空间做一个引发「无障碍」思考的互动装置\n\n哪一个方向戳中你了？我可以给你更多细节 🤘';
+  }
+  
+  // 价值观
+  if (/价值|理念|使命|愿景|核心/.test(t)) {
+    return '45°青年的核心价值观：\n\n' + k.values.map((v, i) => (i+1) + '. **' + v + '**').join('\n') + '\n\n我们相信「斜杠」不只是一种身份，更是一种态度——用多元的方式创造社会价值。';
+  }
+  
+  // 感谢/称赞
+  if (/谢谢|感谢|厉害|棒|好|不错|赞|👍/.test(t)) {
+    return '哈哈谢谢！😄 有需要随时找我——社团百事通不是白叫的～';
+  }
+  
+  // 闲聊/打招呼
+  if (/你好|嗨|hi|hello|您好|在吗|哈喽/.test(t)) {
+    const g = ['嘿！有啥想了解的？🤘', '嗨嗨～今天天气不错，适合聊点公益！', '哟，来了啊！想聊社团、找灵感、还是单纯唠唠？'];
+    return g[Math.floor(Math.random() * g.length)];
+  }
+  
+  // 默认：知识库中没有匹配的
+  return AI_SILLY_REPLIES[Math.floor(Math.random() * AI_SILLY_REPLIES.length)];
+}
+
+function getUpcomingActivities() {
+  if (typeof ACTIVITIES !== 'undefined') {
+    return ACTIVITIES.filter(a => a.type === 'upcoming');
+  }
+  return [];
 }
 
 // Close AI panel when clicking outside

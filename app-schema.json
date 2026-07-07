@@ -31,14 +31,31 @@
         {"columnName": "id", "columnType": "INT", "columnComment": "主键ID", "isRequired": true, "isPrimary": true, "isShow": true},
         {"columnName": "title", "columnType": "VARCHAR(255)", "columnComment": "活动标题", "isRequired": true, "isPrimary": false, "isShow": true},
         {"columnName": "summary", "columnType": "fullText", "columnComment": "活动简介", "isRequired": true, "isPrimary": false, "isShow": true},
-        {"columnName": "content", "columnType": "fullText", "columnComment": "活动详情", "isRequired": false, "isPrimary": false, "isShow": false},
+        {"columnName": "content", "columnType": "fullText", "columnComment": "活动详情 (支持Markdown)", "isRequired": false, "isPrimary": false, "isShow": false},
         {"columnName": "date", "columnType": "date", "columnComment": "活动日期", "isRequired": true, "isPrimary": false, "isShow": true},
         {"columnName": "location", "columnType": "VARCHAR(500)", "columnComment": "活动地点", "isRequired": true, "isPrimary": false, "isShow": true},
         {"columnName": "cover_image", "columnType": "images", "columnComment": "封面图片", "isRequired": false, "isPrimary": false, "isShow": true},
+        {"columnName": "media", "columnType": "images", "columnComment": "活动照片(逗号分隔)", "isRequired": false, "isPrimary": false, "isShow": false},
         {"columnName": "category", "columnType": "VARCHAR(50)", "columnComment": "分类(培训/实践/活动)", "isRequired": false, "isPrimary": false, "isShow": true},
         {"columnName": "type", "columnType": "VARCHAR(50)", "columnComment": "类型(upcoming/past)", "isRequired": true, "isPrimary": false, "isShow": true},
+        {"columnName": "external_url", "columnType": "VARCHAR(500)", "columnComment": "外部报名链接(可选)", "isRequired": false, "isPrimary": false, "isShow": false},
         {"columnName": "status", "columnType": "VARCHAR(50)", "columnComment": "状态(draft/published)", "isRequired": false, "isPrimary": false, "isShow": true},
-        {"columnName": "created_at", "columnType": "datetime", "columnComment": "创建时间", "isRequired": false, "isPrimary": false, "isShow": true}
+        {"columnName": "created_at", "columnType": "datetime", "columnComment": "创建时间", "isRequired": false, "isPrimary": false, "isShow": true},
+        {"columnName": "updated_at", "columnType": "datetime", "columnComment": "更新时间", "isRequired": false, "isPrimary": false, "isShow": true}
+      ]
+    },
+    {
+      "tableName": "activity_images",
+      "description": "活动影像表",
+      "columns": [
+        {"columnName": "id", "columnType": "INT", "columnComment": "主键ID", "isRequired": true, "isPrimary": true, "isShow": true},
+        {"columnName": "activity_id", "columnType": "INT", "columnComment": "关联活动ID", "isRequired": false, "isPrimary": false, "isShow": true},
+        {"columnName": "title", "columnType": "VARCHAR(255)", "columnComment": "图片标题", "isRequired": false, "isPrimary": false, "isShow": true},
+        {"columnName": "image_url", "columnType": "VARCHAR(500)", "columnComment": "图片URL", "isRequired": true, "isPrimary": false, "isShow": true},
+        {"columnName": "image_type", "columnType": "VARCHAR(50)", "columnComment": "类型(activity/gallery/cover)", "isRequired": false, "isPrimary": false, "isShow": true},
+        {"columnName": "sort_order", "columnType": "INT", "columnComment": "排序序号", "isRequired": false, "isPrimary": false, "isShow": true},
+        {"columnName": "created_at", "columnType": "datetime", "columnComment": "创建时间", "isRequired": false, "isPrimary": false, "isShow": true},
+        {"columnName": "updated_at", "columnType": "datetime", "columnComment": "更新时间", "isRequired": false, "isPrimary": false, "isShow": true}
       ]
     }
   ]
