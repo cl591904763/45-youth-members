@@ -669,6 +669,7 @@
                     <div class="flex items-center justify-between mb-4">
                         <div class="text-sm" style="color:#6b6040;">活动列表</div>
                         <button onclick="openActivityModal()" class="btn-u btn-primary text-sm">＋ 新增活动</button>
+                        <button onclick="seedDefaultActivities()" class="btn-u btn-ghost text-sm" style="margin-left:8px;">🔄 恢复默认活动</button>
                     </div>
                     <div class="card-u overflow-hidden">
                         <div class="overflow-x-auto">
@@ -1441,6 +1442,76 @@ function switchAdminTab(tabId) {
   document.getElementById(tabId).style.display = 'block';
   if (tabId === 'admin-activities') loadActivities();
   if (tabId === 'admin-images') loadImages();
+}
+
+// ===== SEED DEFAULT DATA =====
+const DEFAULT_ACTIVITIES = [
+  { title:'0元60天·公益融合艺术节', summary:'废弃地下家具城改造为艺术空间，招募策展人/艺术家/志愿者，共同打造一场前所未有的公益融合艺术节。', content:'这是一个为期60天的公益艺术实验。我们将废弃的地下家具城改造为全新的艺术空间，邀请策展人、艺术家、设计师和志愿者共同参与。从空间改造到展览策划，从工作坊到开幕活动——全程共创，打造属于青年群体的融合艺术IP。\n\n招募对象：\n- 策展人/助理策展人\n- 视觉/空间艺术家\n- 志愿者（布展、导览、摄影）\n- 活动策划执行', date:'2026-08-01', location:'上海·康健商务广场·1号楼地一层', category:'活动', type:'upcoming', status:'published', cover_image:'images/artfest_recruit_poster.jpg', media:'images/artfest_underground.jpg,images/artfest_neon_poster.jpg,images/artfest_staff_vest.jpg', external_url:'https://cl591904763.github.io/zero-art-festival/' },
+  { title:'青年夜校：无障碍设计入门', summary:'四期课程，从意识唤醒到实操设计思维，了解无障碍设计的核心理念', content:'青年夜校系列课程——无障碍设计入门。\n\n课程安排：\n第1讲：无障碍设计概论（意识唤醒）\n第2讲：包容性设计思维\n第3讲：物理空间无障碍改造\n第4讲：数字产品无障碍实践\n\n每期课程约2小时，含互动工作坊环节。', date:'2026-07-20', location:'上海·静安区', category:'培训', type:'upcoming', status:'published', cover_image:'images/pdf_p06_3.jpeg', media:'images/pdf_p06_4.jpeg,images/pdf_p06_5.jpeg,images/pdf_p06_6.jpeg' },
+  { title:'志愿者赋能工作坊', summary:'融合活动中的沟通技巧与无障碍服务实践', content:'面向志愿者的赋能工作坊，内容涵盖：\n- 与视障/听障人士的沟通技巧\n- 轮椅助行与导盲随行\n- 融合活动中的角色分工\n- 真实案例分享与模拟演练\n\n完成工作坊可获得志愿者赋能证书。', date:'2026-07-28', location:'上海·徐汇区', category:'培训', type:'upcoming', status:'published', cover_image:'images/pdf_p02_2.jpeg', media:'images/pdf_p14_5.jpeg,images/pdf_p18_3.jpeg' },
+  { title:'2026全国助残日主题快闪', summary:'"保障平等权益，促进融合发展"街头公益行动', content:'2026年全国助残日，我们在外滩发起街头公益快闪行动。通过互动体验装置、融合表演和公益市集，让更多人了解无障碍的重要性和包容性社会的价值。', date:'2026-05-17', location:'上海·外滩', category:'活动', type:'past', status:'published', cover_image:'images/pdf_p10_5.jpeg', media:'images/pdf_p12_7.jpeg,images/pdf_p12_8.jpeg' },
+  { title:'无障碍城市徒步', summary:'轮椅体验+盲道行走，感受城市无障碍设施现状', content:'用脚步丈量城市无障碍。参与者分组体验：\n- 轮椅组：坐在轮椅上完成1公里城市路线\n- 盲杖组：佩戴眼罩，使用盲杖行走\n- 观察组：记录无障碍设施的问题与亮点\n\n结束后进行复盘分享，形成一份"城市无障碍体验报告"。', date:'2026-04-15', location:'上海·浦东', category:'实践', type:'past', status:'published', cover_image:'images/pdf_p09_3.jpeg', media:'images/pdf_p09_4.jpeg,images/pdf_p09_5.jpeg' },
+  { title:'情景思政课：包容性社会', summary:'以戏剧教育形式探讨残健融合与社会包容', content:'创新的思政教育形式——通过戏剧教育、角色扮演和情景模拟，让青年学生在沉浸式体验中理解包容性社会的意义，探讨残健融合的实践路径。', date:'2026-03-22', location:'上海·高校', category:'培训', type:'past', status:'published', cover_image:'images/pdf_p10_3.jpeg', media:'images/pdf_p10_4.jpeg,images/pdf_p14_7.jpeg' },
+];
+
+const DEFAULT_IMAGES = [
+  { title:'融合艺术节·招募海报', image_url:'images/artfest_recruit_poster.jpg', image_type:'gallery', sort_order:1 },
+  { title:'废弃家具城改造现场', image_url:'images/artfest_underground.jpg', image_type:'gallery', sort_order:2 },
+  { title:'艺术节·没钱也能赢', image_url:'images/artfest_neon_poster.jpg', image_type:'gallery', sort_order:3 },
+  { title:'45°青年志愿者', image_url:'images/artfest_staff_vest.jpg', image_type:'gallery', sort_order:4 },
+  { title:'团队合影', image_url:'images/pdf_p10_5.jpeg', image_type:'gallery', sort_order:5 },
+  { title:'无以轮比·轮椅跑', image_url:'images/pdf_p12_7.jpeg', image_type:'gallery', sort_order:6 },
+  { title:'45°青年集结', image_url:'images/pdf_p12_8.jpeg', image_type:'gallery', sort_order:7 },
+  { title:'志愿者蓝马甲', image_url:'images/pdf_p09_3.jpeg', image_type:'gallery', sort_order:8 },
+  { title:'畅行计划展板', image_url:'images/pdf_p09_4.jpeg', image_type:'gallery', sort_order:9 },
+  { title:'三民文化村合影', image_url:'images/pdf_p09_5.jpeg', image_type:'gallery', sort_order:10 },
+  { title:'羽毛球互动', image_url:'images/pdf_p13_3.jpeg', image_type:'gallery', sort_order:11 },
+  { title:'城市无障碍徒步', image_url:'images/pdf_p07_2.jpeg', image_type:'gallery', sort_order:12 },
+  { title:'轮椅助行', image_url:'images/pdf_p14_5.jpeg', image_type:'gallery', sort_order:13 },
+  { title:'青年中心', image_url:'images/pdf_p14_7.jpeg', image_type:'gallery', sort_order:14 },
+  { title:'45°青年空间', image_url:'images/pdf_p14_8.jpeg', image_type:'gallery', sort_order:15 },
+  { title:'高校助残联盟', image_url:'images/pdf_p15_7.jpeg', image_type:'gallery', sort_order:16 },
+  { title:'轮椅跑预热', image_url:'images/pdf_p18_3.jpeg', image_type:'gallery', sort_order:17 },
+  { title:'ART设计', image_url:'images/pdf_p18_4.jpeg', image_type:'gallery', sort_order:18 },
+  { title:'青年中心外景', image_url:'images/pdf_p22_2.jpeg', image_type:'gallery', sort_order:19 },
+  { title:'青年交流会', image_url:'images/pdf_p10_3.jpeg', image_type:'gallery', sort_order:20 },
+  { title:'沙龙讨论', image_url:'images/pdf_p10_4.jpeg', image_type:'gallery', sort_order:21 },
+  { title:'团队共创', image_url:'images/pdf_p03_3.jpeg', image_type:'gallery', sort_order:22 },
+  { title:'工作坊协作', image_url:'images/pdf_p08_6.jpeg', image_type:'gallery', sort_order:23 },
+  { title:'公益市集', image_url:'images/pdf_p13_6.jpeg', image_type:'gallery', sort_order:24 },
+];
+
+async function seedDefaultActivities() {
+  if (!confirm('将恢复6个默认活动数据（已有的不会被覆盖），确定继续？')) return;
+  const btn = event.target; btn.textContent = '恢复中...'; btn.disabled = true;
+  let count = 0;
+  for (const act of DEFAULT_ACTIVITIES) {
+    try {
+      // Check if exists
+      const existing = await client.db.from('activities').list();
+      const dup = Array.isArray(existing.data) && existing.data.some(a => a.title === act.title);
+      if (!dup) {
+        await client.db.from('activities').insert({ ...act, created_at: new Date().toISOString().slice(0,19).replace('T', ' ') });
+        count++;
+      }
+    } catch(e) { console.warn('seed activity err:', e); }
+  }
+  await addDefaultImages();
+  toast('已恢复 ' + count + ' 个活动 + 默认图库 ✅');
+  loadActivities(); loadImages();
+  btn.textContent = '🔄 恢复默认活动'; btn.disabled = false;
+}
+
+async function addDefaultImages() {
+  for (const img of DEFAULT_IMAGES) {
+    try {
+      const existing = await client.db.from('activity_images').list();
+      const dup = Array.isArray(existing.data) && existing.data.some(i => i.image_url === img.image_url);
+      if (!dup) {
+        await client.db.from('activity_images').insert({ ...img, created_at: new Date().toISOString().slice(0,19).replace('T', ' ') });
+      }
+    } catch(e) { /* skip dupes */ }
+  }
 }
 
 // ===== ACTIVITY CRUD =====
