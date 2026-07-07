@@ -918,36 +918,26 @@ function createFileInput(callback) {
 async function uploadFileToBAAS(file, callback) {
   const toastEl = toast('上传中...', 'info');
   try {
-    // Read as data URL
-    const dataUrl = await new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
-    
-    // Try BAAS upload
-    const ext = file.name.split('.').pop() || 'png';
-    const res = await client.request('/common/uploadByUrl', {
-      method: 'POST',
-      body: JSON.stringify({
-        fileUrl: dataUrl,
-        formatter: ext,
-        contentType: file.type || 'image/png'
-      })
-    });
+    // Use native BAAS file upload (FormData via client.upload())
+    const res = await client.upload().file(file);
     
     let url;
     if (res && res.success && res.data) {
       url = res.data;
-      // If it returns just a filename, prepend IMG_PATH
-      if (typeof url === 'string' && !url.startsWith('http') && !url.startsWith('data:')) {
+      // If it returns a relative path, prepend IMG_PATH
+      if (typeof url === 'string' && !url.startsWith('http') && !url.startsWith('data:') && !url.startsWith('/')) {
         url = IMG_PATH + url;
       }
-    } else if (res && res.data) {
-      url = typeof res.data === 'string' ? res.data : IMG_PATH + 'upload_' + Date.now() + '.' + ext;
+    } else if (res && typeof res.data === 'string') {
+      url = res.data;
     } else {
-      // Fallback: use data URL directly
+      // Fallback: read as data URL
+      const dataUrl = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
       url = dataUrl;
     }
     
@@ -955,7 +945,7 @@ async function uploadFileToBAAS(file, callback) {
     if (callback) callback(url);
   } catch(err) {
     console.error('upload error:', err);
-    toast('上传失败，请手动输入URL', 'error');
+    toast('上传失败，请检查网络或重试', 'error');
   }
 }
 
