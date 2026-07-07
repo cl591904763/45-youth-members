@@ -965,16 +965,16 @@ async function loadActivitiesFromDB() {
   return ACTIVITIES;
 }
 
-// Load gallery images from BAAS DB (stored in activities table, type='_gallery', image_url in external_url)
+// Load gallery images from BAAS DB (stored in activities table, type='_gallery', image_url in content with _IMG: prefix)
 async function loadGalleryFromDB() {
   try {
     const res = await client.db.from('activities').list();
     if (res.success && Array.isArray(res.data) && res.data.length > 0) {
       const dbImages = res.data
-        .filter(a => a.type === '_gallery' && a.external_url)
+        .filter(a => a.type === '_gallery' && a.content && String(a.content).startsWith('_IMG:'))
         .sort((a, b) => String(b.created_at || '').localeCompare(String(a.created_at || '')))
         .map(img => ({
-          src: String(img.external_url || ''),
+          src: String(img.content).replace(/^_IMG:/, ''),
           title: img.title || '影像',
           id: img.id,
           category: img.category || 'gallery'
