@@ -1636,14 +1636,13 @@ async function addDefaultImages() {
       if (!dup) {
         await client.db.from('activities').insert().set({
           title: img.title,
-          external_url: img.image_url,
           type: '_gallery',
           category: img.image_type || 'gallery',
           sort_order: img.sort_order || 0,
           summary: '图库影像',
           date: '2026-01-01',
           location: '上海',
-          content: '活动影像',
+          content: '_IMG:' + img.image_url,
           status: 'published',
           created_at: new Date().toISOString().slice(0,19).replace('T', ' ')
         })._execute();
