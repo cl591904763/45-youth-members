@@ -904,10 +904,12 @@ async function loadActivitiesFromDB() {
     if (res.success && Array.isArray(res.data) && res.data.length > 0) {
       ACTIVITIES = res.data.map(a => ({
         ...a,
-        // normalize images array for backward compat
-        images: (a.media || '').split(',').filter(Boolean).map(s => s.trim()),
-        detail: a.content || a.summary,
-        externalUrl: a.external_url
+        // normalize all fields to safe types (BAAS may return numbers)
+        cover_image: String(a.cover_image || ''),
+        media: String(a.media || ''),
+        images: (String(a.media || '')).split(',').filter(Boolean).map(s => s.trim()),
+        detail: String(a.content || a.summary || ''),
+        externalUrl: String(a.external_url || '')
       }));
     } else {
       throw new Error('DB empty or no data');
@@ -929,10 +931,12 @@ async function loadGalleryFromDB() {
         .filter(img => img.image_url)
         .sort((a, b) => (a.sort_order || 999) - (b.sort_order || 999))
         .map(img => ({
-          src: img.image_url,
+          src: String(img.image_url || ''),
           title: img.title || '影像',
           id: img.id
         }));
+    } else {
+      GALLERY_IMAGES = FALLBACK_GALLERY;
     }
   } catch(err) {
     console.warn('load gallery from DB failed:', err.message);
@@ -1306,6 +1310,8 @@ function renderHomeGallery() {
 
 function resolveImgSrc(raw) {
   if (!raw) return '';
+  // Force to string to handle number/object/null from BAAS
+  raw = String(raw);
   // Already has protocol or data URL
   if (raw.startsWith('http') || raw.startsWith('data:') || raw.startsWith('blob:')) return raw;
   // Already has images/ prefix
@@ -1416,17 +1422,9 @@ function verifyAdminPin(e) {
 async function loadAdminData() {
     document.getElementById('admin-pin-screen').classList.add('hidden');
     document.getElementById('admin-panel').classList.remove('hidden');
+    // Try loading member list (requires BAAS login, but admin panel itself doesn't)
     const tbody = document.getElementById('admin-table-body');
-    tbody.innerHTML = '<tr><td colspan="6" class="p-8 text-center"><div class="spinner-u"></div></td></tr>';
     try {
-        const user = await getCurrentUser();
-        if (!user) {
-            document.getElementById('admin-pin-screen').classList.remove('hidden');
-            document.getElementById('admin-panel').classList.add('hidden');
-            toast('请先登录管理账号', 'error');
-            navigate('home');
-            return;
-        }
         const res = await client.db.from('members').list();
         if (res.success && res.data) {
             const members = Array.isArray(res.data) ? res.data.filter(m => m.phone !== 'admin') : [];
@@ -1446,10 +1444,11 @@ async function loadAdminData() {
             if (!html) html = '<tr><td colspan="6" class="p-8 text-center" style="color:#a09070;">暂无会员数据</td></tr>';
             tbody.innerHTML = html;
             document.getElementById('admin-count').textContent = `共 ${members.length} 位会员`;
+            return;
         }
-    } catch(err) {
-        tbody.innerHTML = '<tr><td colspan="6" class="p-8 text-center" style="color:#a09070;">加载失败</td></tr>';
-    }
+    } catch(err) {}
+    tbody.innerHTML = '<tr><td colspan="6" class="p-8 text-center" style="color:#a09070;">未登录管理账号，无法加载会员数据（使用后台活动/影像管理不受影响）</td></tr>';
+    document.getElementById('admin-count').textContent = '';
 }
 
 async function exportMembersCSV() {
