@@ -1943,7 +1943,6 @@ async function saveImage(e) {
       galleryData.summary = '图库影像';
       galleryData.date = new Date().toISOString().slice(0,10);
       galleryData.location = '';
-      galleryData.content = '';
       galleryData.status = 'published';
       res = await insertInto('activities', galleryData);
     }
