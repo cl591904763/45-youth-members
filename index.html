@@ -942,21 +942,25 @@ async function loadActivitiesFromDB() {
           merged.push(fa);
         }
       });
-      // Sort DB activities: newest created_at first, exclude gallery type
+      // DB activities: newest created_at first, exclude gallery type
       merged.sort((a, b) => {
         if (a.type === '_gallery') return 1;
         if (b.type === '_gallery') return -1;
-        const aT = String(a.created_at || a.date || '');
-        const bT = String(b.created_at || b.date || '');
+        const aT = String(a.created_at || '');
+        const bT = String(b.created_at || '');
         return bT.localeCompare(aT);
       });
-      ACTIVITIES = merged.filter(a => a.type !== '_gallery');
+      // Split: DB-sourced first (sorted by created_at), then fallback-only last (preserve order)
+      const hasCreated = (x) => x.created_at && String(x.created_at).trim() !== '';
+      const dbFirst = merged.filter(a => a.type !== '_gallery' && hasCreated(a));
+      const fbOnly = merged.filter(a => a.type !== '_gallery' && !hasCreated(a));
+      ACTIVITIES = [...dbFirst, ...fbOnly];
     } else {
       throw new Error('DB empty or no data');
     }
   } catch(err) {
     console.warn('load activities from DB failed, using fallback:', err.message);
-    ACTIVITIES = FALLBACK_ACTIVITIES.slice().sort((a, b) => String(b.created_at || b.date || '').localeCompare(String(a.created_at || a.date || '')));
+    ACTIVITIES = [...FALLBACK_ACTIVITIES];
   }
   return ACTIVITIES;
 }
