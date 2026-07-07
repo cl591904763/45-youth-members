@@ -914,6 +914,21 @@ async function loadActivitiesFromDB() {
       // Merge: DB activities first, then fallback activities that aren't duplicate titles
       const dbTitles = new Set(dbActivities.map(a => a.title));
       const merged = [...dbActivities];
+      // Build a fallback lookup by title
+      const fallbackByTitle = {};
+      FALLBACK_ACTIVITIES.forEach(fa => { fallbackByTitle[fa.title] = fa; });
+      // Patch DB activities that lack cover_image/media from their fallback counterparts
+      merged.forEach(m => {
+        const fb = fallbackByTitle[m.title];
+        if (fb) {
+          if (!m.cover_image && fb.cover_image) m.cover_image = fb.cover_image;
+          if (!m.media && fb.media) m.media = fb.media;
+          if ((!m.images || !m.images.length) && fb.media) {
+            m.images = String(fb.media).split(',').filter(Boolean).map(s => s.trim());
+          }
+        }
+      });
+      // Add fallback activities with truly unique titles
       FALLBACK_ACTIVITIES.forEach(fa => {
         if (!dbTitles.has(fa.title)) {
           merged.push(fa);
@@ -944,9 +959,16 @@ async function loadGalleryFromDB() {
           title: img.title || '影像',
           id: img.id
         }));
-      // Merge: DB images first, then fallback images that aren't duplicate src
+      // Merge: DB images first, then fallback images that aren't duplicate src/title
       const dbSrcs = new Set(dbImages.map(i => i.src));
+      const fallbackByTitle = {};
+      FALLBACK_GALLERY.forEach(fg => { fallbackByTitle[fg.title] = fg; });
       const merged = [...dbImages];
+      // Patch DB images missing src from fallback
+      merged.forEach(m => {
+        const fb = fallbackByTitle[m.title];
+        if (fb && !m.src) m.src = fb.src;
+      });
       FALLBACK_GALLERY.forEach(fg => {
         if (!dbSrcs.has(fg.src)) {
           merged.push(fg);
