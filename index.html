@@ -783,6 +783,7 @@
                 <input type="text" id="act-cover" class="f-u flex-1" placeholder="images/xxx.jpg 或 https://...">
                 <button type="button" onclick="uploadImage('act-cover')" class="btn-u btn-primary text-sm !px-3 !py-2 whitespace-nowrap">📁 上传</button>
               </div>
+              <div id="act-cover-preview" class="mt-2" style="display:none;"><img id="act-cover-preview-img" style="max-width:150px;max-height:100px;border-radius:6px;border:2px solid #e0d8c5;"></div>
             </div>
             <div>
               <label class="text-xs mb-1 block font-medium" style="color:#6b6040;">活动照片 (多张用逗号分隔)</label>
@@ -1010,17 +1011,26 @@ async function uploadFileToBAAS(file, callback) {
     const res = await client.storage.upload().file(file);
     
     let url = '';
-    // BAAS storage upload returns {success, data: {url,id,...}} or {success, data: 'url_string'}
-    if (res && res.success) {
-      if (typeof res.data === 'string') {
-        url = res.data;
-      } else if (res.data && typeof res.data.url === 'string') {
-        url = res.data.url;
-      } else if (res.data && res.data.path) {
-        url = res.data.path;
+    // BAAS storage upload returns multiple possible formats:
+    // {success:true, data:{url:'...',...}} or {success:true, data:'url_string'}
+    // or {code:0, data:{fileName:'https://...',newFileName:'...'}}
+    if (res) {
+      const d = res.data;
+      if (typeof d === 'string') {
+        url = d;
+      } else if (d && typeof d.url === 'string') {
+        url = d.url;
+      } else if (d && typeof d.fileName === 'string') {
+        url = d.fileName;
+      } else if (d && typeof d.path === 'string') {
+        url = d.path;
       }
     }
     
+    if (!url) {
+      // Try nested fallback: res.data might have {url} key
+      try { url = res.data.url || res.data.fileName || res.data.path || ''; } catch(e) {}
+    }
     if (!url) {
       console.error('upload BAAS response format unexpected:', res);
       toast('上传失败：服务器返回格式异常', 'error');
@@ -1043,10 +1053,23 @@ function uploadActivityMedia() {
   });
 }
 
+function updateCoverPreview() {
+  const url = document.getElementById('act-cover').value.trim();
+  const preview = document.getElementById('act-cover-preview');
+  const img = document.getElementById('act-cover-preview-img');
+  if (!preview || !img) return;
+  if (url) {
+    preview.style.display = 'block';
+    img.src = img.src = (url.startsWith('http')||url.startsWith('data:')) ? url : 'images/' + url.replace(/^images\//,'');
+  } else {
+    preview.style.display = 'none';
+  }
+}
+
 function uploadImage(fieldId) {
   createFileInput(function(url) {
     document.getElementById(fieldId).value = url;
-    // Trigger preview update for image-url field
+    if (fieldId === 'act-cover') updateCoverPreview();
     if (fieldId === 'img-url' && typeof updateImagePreview === 'function') {
       updateImagePreview();
     }
@@ -1606,7 +1629,12 @@ async function loadActivities() {
   try {
     const res = await client.db.from('activities').list();
     if (res.success && res.data) {
-      adminActivities = Array.isArray(res.data) ? res.data : [];
+      adminActivities = (Array.isArray(res.data) ? res.data : []).map(a => ({
+        ...a,
+        cover_image: (function(v){ v = String(v||''); return (v==='[object Object]'||v==='undefined'||v==='null')?'':v; })(a.cover_image),
+        media: (function(v){ v = String(v||''); return (v==='[object Object]'||v==='undefined'||v==='null')?'':v; })(a.media),
+        external_url: (function(v){ v = String(v||''); return (v==='[object Object]'||v==='undefined'||v==='null')?'':v; })(a.external_url||'')
+      }));
       renderActivityTable();
     } else {
       tbody.innerHTML = '<tr><td colspan="7" class="p-8 text-center" style="color:#a09070;">暂无活动数据</td></tr>';
@@ -1660,6 +1688,7 @@ function openActivityModal(data) {
   document.getElementById('act-status').value = editing ? (data.status||'published') : 'published';
   document.getElementById('act-url').value = editing ? (data.external_url||'') : '';
   document.getElementById('act-cover').value = editing ? (data.cover_image||'') : '';
+    setTimeout(updateCoverPreview, 50);
   document.getElementById('act-media').value = editing ? (data.media||'') : '';
   openModal('activity-modal');
 }
