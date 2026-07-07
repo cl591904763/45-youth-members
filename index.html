@@ -1646,6 +1646,11 @@ async function addDefaultImages() {
           type: '_gallery',
           category: img.image_type || 'gallery',
           sort_order: img.sort_order || 0,
+          summary: '图库影像',
+          date: '2026-01-01',
+          location: '上海',
+          content: '活动影像',
+          status: 'published',
           created_at: new Date().toISOString().slice(0,19).replace('T', ' ')
         })._execute();
       }
@@ -1941,6 +1946,12 @@ async function saveImage(e) {
       galleryData.created_at = new Date().toISOString().slice(0,19).replace('T', ' ');
       res = await client.db.from('activities').update().set(galleryData)._addFilter('id', 'eq', id)._execute();
     } else {
+      // Required fields for activities table
+      galleryData.summary = '图库影像';
+      galleryData.date = new Date().toISOString().slice(0,10);
+      galleryData.location = '';
+      galleryData.content = '';
+      galleryData.status = 'published';
       res = await insertInto('activities', galleryData);
     }
     toast(id ? '影像已更新 ✅' : '影像已添加 ✅');
