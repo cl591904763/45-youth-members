@@ -167,6 +167,19 @@
         .btn-u { padding:10px 18px; font-size:13px; }
     }
 
+    /* ── Admin desktop fixes ── */
+    @media (min-width:1024px) {
+        .admin-table th, .admin-table td { white-space:nowrap; }
+        .admin-header-actions { flex-wrap:nowrap; }
+    }
+    .admin-img-thumb {
+        width:100%; height:112px; object-fit:cover; border-radius:8px;
+        transition:transform 0.3s;
+    }
+    @media (min-width:768px) { .admin-img-thumb { height:180px; } }
+    @media (min-width:1280px) { .admin-img-thumb { height:220px; } }
+    .admin-img-container { aspect-ratio:auto; }
+
     /* Admin tabs */
     .admin-tab { cursor:pointer; background:transparent; color:#6b6040; border:none; outline:none; }
     .admin-tab.active { background:#fff; color:#2d8a2d; box-shadow:0 1px 4px rgba(0,0,0,0.06); }
@@ -668,14 +681,16 @@
                 </div>
 
                 <div id="admin-activities" class="admin-tab-content" style="display:none;">
-                    <div class="flex items-center justify-between mb-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-0 justify-between mb-4">
                         <div class="text-sm" style="color:#6b6040;">活动列表</div>
-                        <button onclick="openActivityModal()" class="btn-u btn-primary text-sm">＋ 新增活动</button>
-                        <button onclick="seedDefaultActivities()" class="btn-u btn-ghost text-sm" style="margin-left:8px;">🔄 恢复默认活动</button>
+                        <div class="flex gap-2 flex-wrap">
+                            <button onclick="openActivityModal()" class="btn-u btn-primary text-sm">＋ 新增活动</button>
+                            <button onclick="seedDefaultActivities()" class="btn-u btn-ghost text-sm">🔄 恢复默认活动</button>
+                        </div>
                     </div>
                     <div class="card-u overflow-hidden">
                         <div class="overflow-x-auto">
-                            <table class="w-full text-sm">
+                            <table class="w-full text-sm admin-table">
                                 <thead>
                                     <tr style="background:#f5f3f0;">
                                         <th class="text-left p-4 font-medium" style="color:#6b6040;">标题</th>
@@ -1856,13 +1871,13 @@ function renderImageGrid() {
   }
   const typeMap = { gallery:'图库', activity:'活动', cover:'封面' };
   grid.innerHTML = adminImages.map(img => `
-    <div class="card-u p-2 relative group">
-      <div class="w-full h-28 rounded-lg overflow-hidden mb-2" style="background:#f5f3f0;">
-        <img src="${escHtml(stripHtml(img.image_url||''))}" alt="${escHtml(img.title||'影像')}" class="w-full h-full object-cover" onerror="this.parentElement.innerHTML='<div style=\"display:flex;align-items:center;justify-content:center;height:100%;color:#a09070;font-size:11px;\'>图片加载失败</div>'">
+    <div class="card-u p-3 relative group">
+      <div class="w-full admin-img-container rounded-lg overflow-hidden mb-2" style="background:#f5f3f0;">
+        <img src="${escHtml(stripHtml(img.image_url||''))}" alt="${escHtml(img.title||'影像')}" class="admin-img-thumb" onerror="this.parentElement.innerHTML='<div style=\"display:flex;align-items:center;justify-content:center;height:160px;color:#a09070;font-size:11px;\'>图片加载失败</div>'">
       </div>
       <div class="text-xs font-medium truncate">${escHtml(img.title||'无标题')}</div>
       <div class="text-xs" style="color:#a09070;">${typeMap[img.image_type]||img.image_type||'图库'}</div>
-      <div class="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+      <div class="absolute top-3 right-3 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
         <button onclick="editImage(${img.id})" class="text-xs bg-white rounded-lg px-2 py-1 shadow" style="color:#2d8a2d;">✏️</button>
         <button onclick="deleteImage(${img.id})" class="text-xs bg-white rounded-lg px-2 py-1 shadow" style="color:#d4602f;">🗑️</button>
       </div>
