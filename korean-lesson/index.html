@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>🇰🇷 小艺韩语入门</title>
+    <title>🇰🇷 韩语入门</title>
     <style>
         *{margin:0;padding:0;box-sizing:border-box}
         body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f8f6f3;color:#2d2818;padding:0 0 60px}
@@ -16,37 +16,37 @@
         .card-row{display:flex;align-items:center;padding:10px 14px;border-bottom:1px solid #f3f0e8;gap:10px}
         .card-row:last-child{border-bottom:none}
         .korean{font-size:20px;font-weight:700;min-width:60px;text-align:center;color:#1a6b1a}
+        .korean-sm{font-size:16px;font-weight:700;min-width:60px;text-align:center;color:#1a6b1a}
         .desc{flex:1;font-size:13px;color:#6b6040;line-height:1.4}
         .play-btn{width:36px;height:36px;border-radius:50%;border:none;background:#f0faf0;color:#2d8a2d;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s}
         .play-btn:active{transform:scale(.9);background:#2d8a2d;color:#fff}
         .play-btn.playing{background:#2d8a2d;color:#fff}
-        .sub{font-size:11px;color:#a09070;margin-top:2px}
         .badge{display:inline-block;font-size:10px;padding:1px 6px;border-radius:4px;background:#f0f0e8;color:#8c8060;margin-left:4px}
         .footer{text-align:center;padding:24px 12px;font-size:12px;color:#a09070}
-        .progress-wrap{height:3px;background:#e8e4dc;border-radius:2px;margin-top:4px;overflow:hidden}
-        .progress-bar{height:100%;width:0%;background:#2d8a2d;transition:width .1s}
+        .status{text-align:center;padding:10px;font-size:13px;color:#6b6040;display:none}
+        .loading .status{display:block}
     </style>
 </head>
 <body>
 <div class="header">
     <h1>🇰🇷 韩语入门 · 发音教程</h1>
-    <p>小艺 Claw 为你制作 · 点播放按钮听发音</p>
+    <p>点 ▶ 听发音</p>
 </div>
 
 <!-- 第1课 -->
 <div class="section">
     <div class="section-title">🔤 第1课 · 基本元音 (10个)</div>
     <div class="card" id="sec1">
-        <div class="card-row"><span class="korean">아</span><div class="desc">a <span class="badge">啊</span></div><button class="play-btn" data-src="01-01-아.mp3">▶</button></div>
-        <div class="card-row"><span class="korean">야</span><div class="desc">ya <span class="badge">呀</span></div><button class="play-btn" data-src="01-02-야.mp3">▶</button></div>
-        <div class="card-row"><span class="korean">어</span><div class="desc">eo <span class="badge">ɔ 嘴张大</span></div><button class="play-btn" data-src="01-03-어.mp3">▶</button></div>
-        <div class="card-row"><span class="korean">여</span><div class="desc">yeo <span class="badge">yɔ</span></div><button class="play-btn" data-src="01-04-여.mp3">▶</button></div>
-        <div class="card-row"><span class="korean">오</span><div class="desc">o <span class="badge">오</span></div><button class="play-btn" data-src="01-05-오.mp3">▶</button></div>
-        <div class="card-row"><span class="korean">요</span><div class="desc">yo <span class="badge">요</span></div><button class="play-btn" data-src="01-06-요.mp3">▶</button></div>
-        <div class="card-row"><span class="korean">우</span><div class="desc">u <span class="badge">呜</span></div><button class="play-btn" data-src="01-07-우.mp3">▶</button></div>
-        <div class="card-row"><span class="korean">유</span><div class="desc">yu <span class="badge">有</span></div><button class="play-btn" data-src="01-08-유.mp3">▶</button></div>
-        <div class="card-row"><span class="korean">으</span><div class="desc">eu <span class="badge">ɯ 嘴扁</span></div><button class="play-btn" data-src="01-09-으.mp3">▶</button></div>
-        <div class="card-row"><span class="korean">이</span><div class="desc">i <span class="badge">一</span></div><button class="play-btn" data-src="01-10-이.mp3">▶</button></div>
+        <div class="card-row"><span class="korean">아</span><div class="desc">a <span class="badge">啊</span></div><button class="play-btn" data-src="01-v-a.mp3">▶</button></div>
+        <div class="card-row"><span class="korean">야</span><div class="desc">ya <span class="badge">呀</span></div><button class="play-btn" data-src="01-v-ya.mp3">▶</button></div>
+        <div class="card-row"><span class="korean">어</span><div class="desc">eo <span class="badge">ɔ 嘴张大</span></div><button class="play-btn" data-src="01-v-eo.mp3">▶</button></div>
+        <div class="card-row"><span class="korean">여</span><div class="desc">yeo <span class="badge">yɔ</span></div><button class="play-btn" data-src="01-v-yeo.mp3">▶</button></div>
+        <div class="card-row"><span class="korean">오</span><div class="desc">o <span class="badge">오</span></div><button class="play-btn" data-src="01-v-o.mp3">▶</button></div>
+        <div class="card-row"><span class="korean">요</span><div class="desc">yo <span class="badge">요</span></div><button class="play-btn" data-src="01-v-yo.mp3">▶</button></div>
+        <div class="card-row"><span class="korean">우</span><div class="desc">u <span class="badge">呜</span></div><button class="play-btn" data-src="01-v-u.mp3">▶</button></div>
+        <div class="card-row"><span class="korean">유</span><div class="desc">yu <span class="badge">有</span></div><button class="play-btn" data-src="01-v-yu.mp3">▶</button></div>
+        <div class="card-row"><span class="korean">으</span><div class="desc">eu <span class="badge">ɯ 嘴扁</span></div><button class="play-btn" data-src="01-v-eu.mp3">▶</button></div>
+        <div class="card-row"><span class="korean">이</span><div class="desc">i <span class="badge">一</span></div><button class="play-btn" data-src="01-v-i.mp3">▶</button></div>
     </div>
 </div>
 
@@ -54,20 +54,20 @@
 <div class="section">
     <div class="section-title">🔤 第2课 · 基本辅音 (14个)</div>
     <div class="card" id="sec2">
-        <div class="card-row"><span class="korean">가</span><div class="desc">g/k</div><button class="play-btn" data-src="02-01-가.mp3">▶</button></div>
-        <div class="card-row"><span class="korean">나</span><div class="desc">n</div><button class="play-btn" data-src="02-02-나.mp3">▶</button></div>
-        <div class="card-row"><span class="korean">다</span><div class="desc">d/t</div><button class="play-btn" data-src="02-03-다.mp3">▶</button></div>
-        <div class="card-row"><span class="korean">라</span><div class="desc">r/l</div><button class="play-btn" data-src="02-04-라.mp3">▶</button></div>
-        <div class="card-row"><span class="korean">마</span><div class="desc">m</div><button class="play-btn" data-src="02-05-마.mp3">▶</button></div>
-        <div class="card-row"><span class="korean">바</span><div class="desc">b/p</div><button class="play-btn" data-src="02-06-바.mp3">▶</button></div>
-        <div class="card-row"><span class="korean">사</span><div class="desc">s</div><button class="play-btn" data-src="02-07-사.mp3">▶</button></div>
-        <div class="card-row"><span class="korean">아</span><div class="desc">（无声母）</div><button class="play-btn" data-src="02-08-아.mp3">▶</button></div>
-        <div class="card-row"><span class="korean">자</span><div class="desc">j</div><button class="play-btn" data-src="02-09-자.mp3">▶</button></div>
-        <div class="card-row"><span class="korean">차</span><div class="desc">ch</div><button class="play-btn" data-src="02-10-차.mp3">▶</button></div>
-        <div class="card-row"><span class="korean">카</span><div class="desc">k（送气）</div><button class="play-btn" data-src="02-11-카.mp3">▶</button></div>
-        <div class="card-row"><span class="korean">타</span><div class="desc">t（送气）</div><button class="play-btn" data-src="02-12-타.mp3">▶</button></div>
-        <div class="card-row"><span class="korean">파</span><div class="desc">p（送气）</div><button class="play-btn" data-src="02-13-파.mp3">▶</button></div>
-        <div class="card-row"><span class="korean">하</span><div class="desc">h</div><button class="play-btn" data-src="02-14-하.mp3">▶</button></div>
+        <div class="card-row"><span class="korean">가</span><div class="desc">g/k</div><button class="play-btn" data-src="02-c-ga.mp3">▶</button></div>
+        <div class="card-row"><span class="korean">나</span><div class="desc">n</div><button class="play-btn" data-src="02-c-na.mp3">▶</button></div>
+        <div class="card-row"><span class="korean">다</span><div class="desc">d/t</div><button class="play-btn" data-src="02-c-da.mp3">▶</button></div>
+        <div class="card-row"><span class="korean">라</span><div class="desc">r/l</div><button class="play-btn" data-src="02-c-ra.mp3">▶</button></div>
+        <div class="card-row"><span class="korean">마</span><div class="desc">m</div><button class="play-btn" data-src="02-c-ma.mp3">▶</button></div>
+        <div class="card-row"><span class="korean">바</span><div class="desc">b/p</div><button class="play-btn" data-src="02-c-ba.mp3">▶</button></div>
+        <div class="card-row"><span class="korean">사</span><div class="desc">s</div><button class="play-btn" data-src="02-c-sa.mp3">▶</button></div>
+        <div class="card-row"><span class="korean">아</span><div class="desc">（无声母）</div><button class="play-btn" data-src="02-c-a.mp3">▶</button></div>
+        <div class="card-row"><span class="korean">자</span><div class="desc">j</div><button class="play-btn" data-src="02-c-ja.mp3">▶</button></div>
+        <div class="card-row"><span class="korean">차</span><div class="desc">ch</div><button class="play-btn" data-src="02-c-cha.mp3">▶</button></div>
+        <div class="card-row"><span class="korean">카</span><div class="desc">k（送气）</div><button class="play-btn" data-src="02-c-ka.mp3">▶</button></div>
+        <div class="card-row"><span class="korean">타</span><div class="desc">t（送气）</div><button class="play-btn" data-src="02-c-ta.mp3">▶</button></div>
+        <div class="card-row"><span class="korean">파</span><div class="desc">p（送气）</div><button class="play-btn" data-src="02-c-pa.mp3">▶</button></div>
+        <div class="card-row"><span class="korean">하</span><div class="desc">h</div><button class="play-btn" data-src="02-c-ha.mp3">▶</button></div>
     </div>
 </div>
 
@@ -75,16 +75,16 @@
 <div class="section">
     <div class="section-title">💬 第3课 · 实用单词</div>
     <div class="card" id="sec3">
-        <div class="card-row"><span class="korean">사랑해</span><div class="desc">saranghae <span class="badge">我爱你 ❤️</span></div><button class="play-btn" data-src="03-01-사랑해.mp3">▶</button></div>
-        <div class="card-row"><span class="korean">안녕하세요</span><div class="desc">annyeonghaseyo <span class="badge">你好 👋</span></div><button class="play-btn" data-src="03-02-안녕하세요.mp3">▶</button></div>
-        <div class="card-row"><span class="korean">감사합니다</span><div class="desc">gamsahamnida <span class="badge">谢谢 🙏</span></div><button class="play-btn" data-src="03-03-감사합니다.mp3">▶</button></div>
-        <div class="card-row"><span class="korean">한국어</span><div class="desc">hangugeo <span class="badge">韩语 🗣️</span></div><button class="play-btn" data-src="03-04-한국어.mp3">▶</button></div>
-        <div class="card-row"><span class="korean">서울</span><div class="desc">seoul <span class="badge">首尔 🏙️</span></div><button class="play-btn" data-src="03-05-서울.mp3">▶</button></div>
-        <div class="card-row"><span class="korean">맛있어요</span><div class="desc">masisseoyo <span class="badge">好吃 😋</span></div><button class="play-btn" data-src="03-06-맛있어요.mp3">▶</button></div>
-        <div class="card-row"><span class="korean">고마워요</span><div class="desc">gomawoyo <span class="badge">谢谢(非敬)</span></div><button class="play-btn" data-src="03-07-고마워요.mp3">▶</button></div>
-        <div class="card-row"><span class="korean">괜찮아요</span><div class="desc">gwaenchanayo <span class="badge">没关系 👍</span></div><button class="play-btn" data-src="03-08-괜찮아요.mp3">▶</button></div>
-        <div class="card-row"><span class="korean">오빠</span><div class="desc">oppa <span class="badge">欧巴 🫣</span></div><button class="play-btn" data-src="03-09-오빠.mp3">▶</button></div>
-        <div class="card-row"><span class="korean">진짜</span><div class="desc">jinjja <span class="badge">真的？🤯</span></div><button class="play-btn" data-src="03-10-진짜.mp3">▶</button></div>
+        <div class="card-row"><span class="korean">사랑해</span><div class="desc">saranghae <span class="badge">我爱你 ❤️</span></div><button class="play-btn" data-src="03-w-saranghae.mp3">▶</button></div>
+        <div class="card-row"><span class="korean">안녕하세요</span><div class="desc">annyeonghaseyo <span class="badge">你好 👋</span></div><button class="play-btn" data-src="03-w-annyeong.mp3">▶</button></div>
+        <div class="card-row"><span class="korean">감사합니다</span><div class="desc">gamsahamnida <span class="badge">谢谢 🙏</span></div><button class="play-btn" data-src="03-w-gamsa.mp3">▶</button></div>
+        <div class="card-row"><span class="korean">한국어</span><div class="desc">hangugeo <span class="badge">韩语 🗣️</span></div><button class="play-btn" data-src="03-w-hangugeo.mp3">▶</button></div>
+        <div class="card-row"><span class="korean">서울</span><div class="desc">seoul <span class="badge">首尔 🏙️</span></div><button class="play-btn" data-src="03-w-seoul.mp3">▶</button></div>
+        <div class="card-row"><span class="korean">맛있어요</span><div class="desc">masisseoyo <span class="badge">好吃 😋</span></div><button class="play-btn" data-src="03-w-masisso.mp3">▶</button></div>
+        <div class="card-row"><span class="korean">고마워요</span><div class="desc">gomawoyo <span class="badge">谢谢(非敬)</span></div><button class="play-btn" data-src="03-w-gomawo.mp3">▶</button></div>
+        <div class="card-row"><span class="korean">괜찮아요</span><div class="desc">gwaenchanayo <span class="badge">没关系 👍</span></div><button class="play-btn" data-src="03-w-gwaenchana.mp3">▶</button></div>
+        <div class="card-row"><span class="korean">오빠</span><div class="desc">oppa <span class="badge">欧巴 🫣</span></div><button class="play-btn" data-src="03-w-oppa.mp3">▶</button></div>
+        <div class="card-row"><span class="korean">진짜</span><div class="desc">jinjja <span class="badge">真的？🤯</span></div><button class="play-btn" data-src="03-w-jinjja.mp3">▶</button></div>
     </div>
 </div>
 
@@ -92,11 +92,11 @@
 <div class="section">
     <div class="section-title">🗣️ 第4课 · 日常对话</div>
     <div class="card" id="sec4">
-        <div class="card-row"><span class="korean" style="font-size:16px">안녕하세요, 반갑습니다.</span><div class="desc">你好，很高兴认识你</div><button class="play-btn" data-src="04-01-안녕하세.mp3">▶</button></div>
-        <div class="card-row"><span class="korean" style="font-size:16px">저는 한국어를 공부하고 있어요.</span><div class="desc">我在学韩语</div><button class="play-btn" data-src="04-02-저는 한.mp3">▶</button></div>
-        <div class="card-row"><span class="korean" style="font-size:16px">이거 얼마예요?</span><div class="desc">这个多少钱？</div><button class="play-btn" data-src="04-03-이거 얼.mp3">▶</button></div>
-        <div class="card-row"><span class="korean" style="font-size:16px">맛있게 드세요!</span><div class="desc">请慢用！</div><button class="play-btn" data-src="04-04-맛있게 .mp3">▶</button></div>
-        <div class="card-row"><span class="korean" style="font-size:16px">다음에 또 만나요!</span><div class="desc">下次再见！</div><button class="play-btn" data-src="04-05-다음에 .mp3">▶</button></div>
+        <div class="card-row"><span class="korean-sm">안녕하세요, 반갑습니다.</span><div class="desc">你好，很高兴认识你</div><button class="play-btn" data-src="04-d-hello.mp3">▶</button></div>
+        <div class="card-row"><span class="korean-sm">저는 한국어를 공부하고 있어요.</span><div class="desc">我在学韩语</div><button class="play-btn" data-src="04-d-study.mp3">▶</button></div>
+        <div class="card-row"><span class="korean-sm">이거 얼마예요?</span><div class="desc">这个多少钱？</div><button class="play-btn" data-src="04-d-price.mp3">▶</button></div>
+        <div class="card-row"><span class="korean-sm">맛있게 드세요!</span><div class="desc">请慢用！</div><button class="play-btn" data-src="04-d-enjoy.mp3">▶</button></div>
+        <div class="card-row"><span class="korean-sm">다음에 또 만나요!</span><div class="desc">下次再见！</div><button class="play-btn" data-src="04-d-seeyou.mp3">▶</button></div>
     </div>
 </div>
 
@@ -104,55 +104,72 @@
 <div class="section">
     <div class="section-title">🧧 Bonus · 汉字词（零门槛）</div>
     <div class="card" id="sec5">
-        <div class="card-row"><span class="korean">학교</span><div class="desc">学校</div><button class="play-btn" data-src="05-01-학교.mp3">▶</button></div>
-        <div class="card-row"><span class="korean">전화</span><div class="desc">电话</div><button class="play-btn" data-src="05-02-전화.mp3">▶</button></div>
-        <div class="card-row"><span class="korean">비행기</span><div class="desc">飞机</div><button class="play-btn" data-src="05-03-비행기.mp3">▶</button></div>
-        <div class="card-row"><span class="korean">문화</span><div class="desc">文化</div><button class="play-btn" data-src="05-04-문화.mp3">▶</button></div>
-        <div class="card-row"><span class="korean">경제</span><div class="desc">经济</div><button class="play-btn" data-src="05-05-경제.mp3">▶</button></div>
-        <div class="card-row"><span class="korean">가족</span><div class="desc">家族 → 家庭</div><button class="play-btn" data-src="05-06-가족.mp3">▶</button></div>
-        <div class="card-row"><span class="korean">시작</span><div class="desc">始作 → 开始</div><button class="play-btn" data-src="05-07-시작.mp3">▶</button></div>
-        <div class="card-row"><span class="korean">약속</span><div class="desc">约定</div><button class="play-btn" data-src="05-08-약속.mp3">▶</button></div>
-        <div class="card-row"><span class="korean">행복</span><div class="desc">幸福</div><button class="play-btn" data-src="05-09-행복.mp3">▶</button></div>
-        <div class="card-row"><span class="korean">사진</span><div class="desc">写真 → 照片</div><button class="play-btn" data-src="05-10-사진.mp3">▶</button></div>
+        <div class="card-row"><span class="korean">학교</span><div class="desc">学校</div><button class="play-btn" data-src="05-h-school.mp3">▶</button></div>
+        <div class="card-row"><span class="korean">전화</span><div class="desc">电话</div><button class="play-btn" data-src="05-h-phone.mp3">▶</button></div>
+        <div class="card-row"><span class="korean">비행기</span><div class="desc">飞机</div><button class="play-btn" data-src="05-h-plane.mp3">▶</button></div>
+        <div class="card-row"><span class="korean">문화</span><div class="desc">文化</div><button class="play-btn" data-src="05-h-culture.mp3">▶</button></div>
+        <div class="card-row"><span class="korean">경제</span><div class="desc">经济</div><button class="play-btn" data-src="05-h-economy.mp3">▶</button></div>
+        <div class="card-row"><span class="korean">가족</span><div class="desc">家族 → 家庭</div><button class="play-btn" data-src="05-h-family.mp3">▶</button></div>
+        <div class="card-row"><span class="korean">시작</span><div class="desc">始作 → 开始</div><button class="play-btn" data-src="05-h-start.mp3">▶</button></div>
+        <div class="card-row"><span class="korean">약속</span><div class="desc">约定</div><button class="play-btn" data-src="05-h-promise.mp3">▶</button></div>
+        <div class="card-row"><span class="korean">행복</span><div class="desc">幸福</div><button class="play-btn" data-src="05-h-happy.mp3">▶</button></div>
+        <div class="card-row"><span class="korean">사진</span><div class="desc">写真 → 照片</div><button class="play-btn" data-src="05-h-photo.mp3">▶</button></div>
     </div>
 </div>
 
 <div class="footer">🇰🇷 小艺 Claw 为你定制 · 点一下就能听</div>
 
 <script>
-const audio = new Audio();
-let currentBtn = null;
-
-document.querySelectorAll('.play-btn').forEach(btn => {
-    btn.addEventListener('click', function() {
-        const src = this.dataset.src;
-        if (!audio.paused && audio.dataset.src === src) {
-            audio.pause();
-            audio.currentTime = 0;
-            this.textContent = '▶';
-            this.classList.remove('playing');
-            return;
-        }
-        if (currentBtn) {
+(function(){
+    var audio = new Audio();
+    var currentBtn = null;
+    var btns = document.querySelectorAll('.play-btn');
+    for(var i=0;i<btns.length;i++){
+        (function(btn){
+            btn.addEventListener('click', function(){
+                var src = this.dataset.src;
+                if(!audio.paused && audio.dataset && audio.dataset.src === src){
+                    audio.pause();
+                    audio.currentTime = 0;
+                    this.textContent = '▶';
+                    this.classList.remove('playing');
+                    return;
+                }
+                if(currentBtn){
+                    currentBtn.textContent = '▶';
+                    currentBtn.classList.remove('playing');
+                }
+                audio.src = src;
+                audio.dataset = audio.dataset || {};
+                audio.dataset.src = src;
+                audio.play().then(function(){
+                    btn.textContent = '⏹';
+                    btn.classList.add('playing');
+                    currentBtn = btn;
+                }).catch(function(e){
+                    console.log('播放失败:', e);
+                    btn.textContent = '⚠';
+                });
+            });
+        })(btns[i]);
+    }
+    audio.addEventListener('ended', function(){
+        if(currentBtn){
             currentBtn.textContent = '▶';
             currentBtn.classList.remove('playing');
+            currentBtn = null;
         }
-        audio.src = src;
-        audio.dataset.src = src;
-        audio.play();
-        this.textContent = '⏹';
-        this.classList.add('playing');
-        currentBtn = this;
     });
-});
-
-audio.addEventListener('ended', () => {
-    if (currentBtn) {
-        currentBtn.textContent = '▶';
-        currentBtn.classList.remove('playing');
-        currentBtn = null;
-    }
-});
+    audio.addEventListener('error', function(){
+        if(currentBtn){
+            currentBtn.textContent = '✕';
+            currentBtn.classList.remove('playing');
+            setTimeout(function(){
+                if(currentBtn) currentBtn.textContent = '▶';
+            }, 2000);
+        }
+    });
+})();
 </script>
 </body>
 </html>
