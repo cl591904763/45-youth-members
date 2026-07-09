@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>45°青年 — 会员系统</title>
-    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-    <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32.png?v=2" />
-    <link rel="apple-touch-icon" href="images/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-45.png" />
+    <link rel="icon" type="image/svg+xml" href="images/logo-45.png" />
+    <link rel="apple-touch-icon" href="images/logo-45.png" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
     tailwind.config = {
@@ -180,6 +180,16 @@
     @media (min-width:1280px) { .admin-img-thumb { height:220px; } }
     .admin-img-container { aspect-ratio:auto; }
 
+    /* ── Logo image ── */
+    .logo-45-img {
+        display:inline-flex; align-items:center; justify-content:center;
+        background:#fff; border-radius:10px; overflow:hidden;
+    }
+    .logo-45-img img {
+        width:100%; height:100%; object-fit:contain;
+        display:block;
+    }
+
     /* Admin tabs */
     .admin-tab { cursor:pointer; background:transparent; color:#6b6040; border:none; outline:none; }
     .admin-tab.active { background:#fff; color:#2d8a2d; box-shadow:0 1px 4px rgba(0,0,0,0.06); }
@@ -188,7 +198,7 @@
 </head>
 <body>
 
-<!-- ═══ Toast ═══ (favicon: images/favicon.png) -->
+<!-- ═══ Toast ═══ -->
 <div id="toast-c"></div>
 
 <!-- ═══ Mobile Menu ═══ -->
@@ -214,7 +224,7 @@
     <div class="max-w-6xl mx-auto px-4 sm:px-8 h-16 flex items-center justify-between">
         <!-- Logo -->
         <a href="#/" onclick="navigate('home');return false;" class="flex items-center gap-2 no-underline" id="admin-easter-egg">
-            <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#2d8a2d,#6fc46f);display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;font-weight:900;font-family:'Noto Serif SC',serif;letter-spacing:1px;">45°</div>
+            <div class="logo-45-img" style="width:36px;height:36px;"><img src="images/logo-45.png" alt="45°"></div>
             <span class="font-bold text-lg hidden sm:block" style="font-family:'Noto Serif SC',serif;color:#2d2818;">45°青年</span>
         </a>
         <!-- Desktop nav -->
@@ -267,9 +277,8 @@
                 </div>
                 <div class="flex-1 flex justify-center">
                     <div style="width:280px;height:280px;border-radius:50%;background:conic-gradient(#2d8a2d,#a8dba8,#6fc46f,#d4602f,#e89040,#2d8a2d);display:flex;align-items:center;justify-content:center;animation:float 4s ease-in-out infinite;">
-                        <div style="width:220px;height:220px;border-radius:50%;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;">
-                            <span style="font-size:48px;font-weight:900;font-family:'Noto Serif SC',serif;background:linear-gradient(135deg,#2d8a2d,#6fc46f);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">45°</span>
-                            <span style="font-size:13px;color:#6b6040;margin-top:2px;">青年</span>
+                        <div style="width:220px;height:220px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:20px;">
+                            <img src="images/logo-45.png" alt="45°青年" style="width:100%;height:100%;object-fit:contain;">
                         </div>
                     </div>
                 </div>
@@ -358,9 +367,8 @@
                         </p>
                     </div>
                     <div class="sm:w-56 flex-shrink-0">
-                        <div style="width:100%;aspect-ratio:1;border-radius:16px;background:linear-gradient(135deg,#f0faf0,#fef8f0);display:flex;flex-direction:column;align-items:center;justify-content:center;">
-                            <div style="font-size:48px;font-weight:900;font-family:'Noto Serif SC',serif;background:linear-gradient(135deg,#2d8a2d,#6fc46f);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">45°</div>
-                            <div style="font-size:14px;color:#6b6040;margin-top:4px;">青年</div>
+                        <div style="width:100%;aspect-ratio:1;border-radius:16px;background:linear-gradient(135deg,#f0faf0,#fef8f0);display:flex;align-items:center;justify-content:center;padding:24px;">
+                            <img src="images/logo-45.png" alt="45°青年" style="width:100%;height:100%;object-fit:contain;">
                         </div>
                     </div>
                 </div>
@@ -735,7 +743,7 @@
     <div class="modal-box">
         <button class="modal-close" onclick="closeModal('login-modal')">✕</button>
         <div class="text-center mb-8">
-            <div style="width:56px;height:56px;border-radius:16px;background:linear-gradient(135deg,#2d8a2d,#6fc46f);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;color:#fff;font-size:20px;font-weight:700;font-family:'Noto Serif SC',serif;">45°</div>
+            <div class="logo-45-img" style="width:56px;height:56px;border-radius:16px;margin:0 auto 12px;"><img src="images/logo-45.png" alt="45°"></div>
             <h3 class="text-xl font-bold">登录</h3>
             <p class="text-xs mt-1" style="color:#a09070;">欢迎回来，45°青年</p>
         </div>
@@ -752,7 +760,7 @@
     <div class="modal-box">
         <button class="modal-close" onclick="closeModal('register-modal')">✕</button>
         <div class="text-center mb-8">
-            <div style="width:56px;height:56px;border-radius:16px;background:linear-gradient(135deg,#2d8a2d,#6fc46f);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;color:#fff;font-size:20px;font-weight:700;font-family:'Noto Serif SC',serif;">45°</div>
+            <div class="logo-45-img" style="width:56px;height:56px;border-radius:16px;margin:0 auto 12px;"><img src="images/logo-45.png" alt="45°"></div>
             <h3 class="text-xl font-bold">加入45°青年</h3>
             <p class="text-xs mt-1" style="color:#a09070;">注册成为会员，参与更多活动</p>
         </div>
@@ -822,7 +830,7 @@
     <div class="modal-box" style="max-width:500px;">
         <button class="modal-close" onclick="closeModal('image-modal')">✕</button>
         <div class="text-center mb-6">
-            <div style="width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,#2d8a2d,#6fc46f);display:flex;align-items:center;justify-content:center;margin:0 auto 10px;color:#fff;font-size:18px;">📸</div>
+            <div class="logo-45-img" style="width:48px;height:48px;border-radius:14px;margin:0 auto 10px;"><img src="images/logo-45.png" alt="45°"></div>
             <h3 class="text-xl font-bold" id="image-modal-title">新增影像</h3>
         </div>
         <form id="image-form" onsubmit="saveImage(event)" class="space-y-3">
@@ -851,7 +859,7 @@
 <!-- ═══════════════════════════════════════════════ -->
 <footer class="py-12" style="background:#2d2818;color:rgba(255,255,255,0.4);">
     <div class="max-w-6xl mx-auto px-4 sm:px-8 text-center">
-        <div style="width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,#2d8a2d,#6fc46f);display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;font-weight:700;font-family:'Noto Serif SC',serif;margin:0 auto 12px;">45°</div>
+        <div class="logo-45-img" style="width:40px;height:40px;border-radius:12px;margin:0 auto 12px;"><img src="images/logo-45.png" alt="45°"></div>
         <div class="text-sm font-bold mb-2" style="color:rgba(255,255,255,0.6);font-family:'Noto Serif SC',serif;">45°青年</div>
         <p class="text-xs mb-6" style="color:rgba(255,255,255,0.3);">破除有形无形障碍 · 探索人生无限可能</p>
         <div class="flex justify-center gap-6 text-xs" style="color:rgba(255,255,255,0.2);">
